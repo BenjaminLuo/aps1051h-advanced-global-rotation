@@ -1,0 +1,13 @@
+Strategy,Regime,GAMF CAGR,SPY CAGR,Alpha,Vol,Max DD
+      OPTIONS,Dot-com Cycle,-1.6%,-14.3%,12.7%,20.9%,-26.8%
+      OPTIONS,Post-9/11 Recovery,15.0%,12.6%,2.4%,34.2%,-31.8%
+      OPTIONS,Global Financial Crisis,-11.3%,-10.6%,-0.7%,22.9%,-29.6%
+      OPTIONS,Post-GFC Expansion,14.7%,13.5%,1.2%,28.2%,-38.0%
+      OPTIONS,COVID-19 Shock & Rally,28.2%,23.4%,4.8%,50.5%,-43.7%
+      OPTIONS,Modern Inflation Cycle,0.3%,8.9%,-8.6%,29.8%,-45.2%
+      BOND_ROTATION,Dot-com Cycle,1.2%,-14.3%,15.6%,19.3%,-19.5%
+      BOND_ROTATION,Post-9/11 Recovery,15.8%,12.6%,3.2%,34.0%,-31.8%
+      BOND_ROTATION,Global Financial Crisis,-6.7%,-10.6%,3.9%,17.4%,-22.1%
+      BOND_ROTATION,Post-GFC Expansion,14.2%,13.5%,0.8%,28.1%,-38.0%
+      BOND_ROTATION,COVID-19 Shock & Rally,22.7%,23.4%,-0.7%,50.1%,-46.1%
+      BOND_ROTATION,Modern Inflation Cycle,2.3%,8.9%,-6.6%,29.4%,-41.8%

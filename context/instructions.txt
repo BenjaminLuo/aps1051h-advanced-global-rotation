@@ -1,0 +1,108 @@
+SYSTEM PROMPT & PROJECT OVERVIEW
+
+You are an expert Quantitative Developer and Financial Engineer. Your task is to implement the Global Adaptive Momentum & Fundamental (GAMF) Overlay, an algorithmic portfolio management system in Python.
+
+The system manages a rotation of U.S. Sector ETFs (to ensure reliable underlying fundamental data), uses Relative Rotational Momentum to select assets, filters them through Fundamental Value Scores (Altman Z-Score, Piotroski F-Score) of their underlying components, and applies dynamic options hedging and portfolio "laddering" for risk management.
+
+Please write clean, modular, object-oriented Python code using pandas, numpy, scikit-learn, yfinance, and scipy.
+
+ARCHITECTURE & MODULE DESIGN
+
+Please structure the codebase into the following distinct modules:
+
+data_loader.py: Handles fetching ETF price data and underlying stock financial statements.
+
+clustering_engine.py: Performs hierarchical clustering on the ETF universe.
+
+momentum_engine.py: Calculates relative rotational momentum.
+
+fundamental_filter.py: Calculates Altman Z-Scores and Piotroski F-Scores.
+
+risk_manager.py: Implements the 4-tranche Laddering system.
+
+hedge_engine.py: Simulates options overlays (Flotation Line & Broken Company triggers).
+
+backtester.py: Integrates modules, runs the historical simulation, and applies White's Reality Check.
+
+PHASE-BY-PHASE IMPLEMENTATION INSTRUCTIONS
+
+Phase 1: Universe Selection & Alpha Generation (Momentum)
+
+Objective: Identify the strongest ETF families.
+
+ETF Universe: Use standard U.S. Sector ETFs (e.g., XLK, XLF, XLV, XLE, XLY, XLP, XLI, XLB, XLU, XLRE).
+
+Clustering: Implement a Hierarchical Clustering algorithm (scikit-learn) using historical returns and volatility as distance metrics to group congruent ETFs.
+
+Momentum Ranking: Implement a Relative Rotational Momentum algorithm. Calculate the rate of change (ROC) over a specified lookback period (e.g., 3 to 6 months) adjusted for volatility. Rank the ETFs/Clusters based on this momentum score.
+
+Phase 2: Fundamental Value Overlay (The Crash Filter)
+
+Objective: Evaluate the underlying health of the top-ranked ETFs.
+
+Component Mapping: For the top-ranked momentum ETFs, program a method to extract or map their Top 10 underlying stock holdings.
+
+Scoring Logic:
+
+Implement the Altman Z-Score formula for the underlying components.
+
+Implement the Piotroski F-Score formula (0-9 criteria) for the underlying components.
+
+Important: Ensure financial data fetching uses point-in-time logic (lagged by 3 months to simulate real-world SEC filing delays) to prevent look-ahead bias.
+
+The "Broken Company" Trigger: If > 30% of an ETF's top 10 holdings have an Altman Z-Score < 1.87 (imminent bankruptcy risk) OR a Piotroski score < 4, flag this ETF as "At-Risk".
+
+Phase 3: Risk Management (The Laddering Protocol)
+
+Objective: Atomize entry risk using time-dimension allocation.
+
+Logic: Do not allocate 100% of the portfolio at once. Divide the total portfolio capital into 4 equal tranches (25% each).
+
+Execution:
+Week 1: Tranche 1 (25%) buys the top momentum ETFs.
+Week 2: Tranche 2 (25%) buys the new top momentum ETFs.
+Week 3: Tranche 3 (25%) buys the new top momentum ETFs.
+Week 4: Tranche 4 (25%) buys the new top momentum ETFs.
+Week 5: Tranche 1 is liquidated and rotated into the current top momentum ETFs.
+
+Requirement: Build a portfolio state tracker that manages these 4 independent buckets and merges them into a single consolidated daily equity curve.
+
+Phase 4: The Dynamic Options Hedging System
+
+Objective: Apply derivative overlays based on systemic and idiosyncratic risk.
+
+Systemic Hedge (Flotation Line):
+Implement a double-filter market breadth check: If the SPY falls below its 200-day SMA AND the trailing 1-year SPY return is less than the 1-year T-Bill yield.
+Action: Trigger a simulated purchase of a 45-to-65 Days to Expiration (DTE) "In The Money" (ITM) Put option on the SPY. Calculate approximate premium drag and payoff.
+
+Idiosyncratic Hedge (Broken Company):
+If an ETF is selected by the Momentum Engine but is flagged as "At-Risk" by Phase 2.
+Action: Instead of dropping the ETF, simulate entering a Bearish Credit Spread or writing a Covered Call against the ETF position to mitigate downside volatility.
+
+Phase 5: Backtesting & Statistical Validation
+
+Objective: Validate the system robustly.
+
+Build a historical simulation engine stepping through time (weekly frequency) from 2006 to present (ensuring the 2007-2008 crash is captured).
+
+White's Reality Check: Implement a bootstrap resampling function to test the null hypothesis that the GAMF Overlay's outperformance versus a Buy-and-Hold SPY benchmark is due to luck. Generate a p-value for the strategy's edge.
+
+EXPERIMENTATION SCRIPTS REQUIRED
+
+Please provide separate execution scripts to run the following isolation experiments:
+
+exp_clustering_congruence.py: A script that runs the momentum algorithm on randomly selected ETFs vs. the hierarchically clustered ETF families. Output Sharpe, Max Drawdown, and Sortino ratios for comparison.
+
+exp_fundamental_threshold.py: A script that runs the fundamental filter using an Altman threshold of 3.0 (at risk) versus 1.87 (imminent bankruptcy risk) to determine which threshold yields a better risk-adjusted equity curve.
+
+exp_laddering_vs_lump.py: A script comparing a 1-month holding period with 100% lump-sum capital allocation against the 4-tranche (25%) staggered weekly laddering allocation. Plot the volatility of both equity curves.
+
+exp_hedge_drag.py: A script comparing the net returns of the unhedged GAMF portfolio against the portfolio utilizing the Flotation Line SPX Puts and Broken Company Credit Spreads.
+
+OUTPUT EXPECTATIONS
+
+Please provide the full Python code for the modules listed above.
+
+Use standard Docstrings to explain your logic, especially inside the financial formulas and White's Reality Check.
+
+Where live options data is unavailable historically, use Black-Scholes approximations to estimate historical option premiums for the hedge engine.

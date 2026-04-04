@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Data (Excluded for GitHub Performance)
+data/processed/*.parquet
+data/processed/*.csv
+!results/*.csv
+
+# Figures
+figures/
+results/figures/*.png
+
+# System
+.DS_Store
+.vscode/
+.idea/
+.gemini/
+antigravity/
+
+# Archive
+archive/
