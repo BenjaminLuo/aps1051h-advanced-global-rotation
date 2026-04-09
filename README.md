@@ -52,7 +52,7 @@ We conducted a comparative experiment on the **2008 Global Financial Crisis (GFC
 - **'Aggressive' Mode**: Sustained deep fundamental stress.
 - **'Recovery' Mode**: Early fundamental improvement rotation.
 
-The system demonstrated a robust **-22.9% maximum drawdown** in both scenarios during the meat of the crisis, proving that the Technical Filter (200-day SMA) provides a vital "safety net" when balanced-sheet fundamentals lag.
+The system demonstrated a robust **-27.5% maximum drawdown** in both scenarios, proving that the MACD-Augmented technical filter provides a vital "safety net" when balanced-sheet fundamentals lag, while reclaiming significant Alpha during the subsequent recovery.
 
 ![GFC Experiment](plots/experiment_gfc_comparison.png)
 
@@ -129,7 +129,7 @@ The system is modularized into steps for transparency:
 
 The system's performance is structurally different across market epochs:
 
-### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **13.05% CAGR**.
+### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **14.39% CAGR**.
 ![Regime 1 Equity](plots/regime_1_GFC/figure_3_equity_drawdown.png)
 
 ### 2. The Long Bull (2011–2019)
