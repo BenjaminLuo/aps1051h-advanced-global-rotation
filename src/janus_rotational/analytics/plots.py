@@ -50,7 +50,8 @@ FONT_LABEL  = {"fontsize": 11}
 FONT_TICK   = {"labelsize": 9}
 FONT_LEGEND = {"fontsize": 9}
 
-PLOT_DIR = Path(__file__).resolve().parents[2] / "plots"
+# Target project root/plots
+PLOT_DIR = Path(__file__).resolve().parents[3] / "plots"
 PLOT_DIR.mkdir(exist_ok=True)
 
 plt.rcParams.update({

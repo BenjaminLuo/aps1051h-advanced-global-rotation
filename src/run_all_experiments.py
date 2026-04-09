@@ -20,7 +20,9 @@ from janus_rotational.analytics.metrics import compute_metrics
 OOS_START = "2005-01-01"
 OOS_END = "2024-12-31"
 INITIAL_CAPITAL = 1_000_000.0
-PLOTS_DIR = "plots/research/"
+from pathlib import Path
+PLOT_ROOT = Path(__file__).resolve().parents[1]
+PLOTS_DIR = PLOT_ROOT / "plots/research/"
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 # ── Suppression ──

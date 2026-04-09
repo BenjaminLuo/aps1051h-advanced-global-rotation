@@ -36,12 +36,14 @@ from janus_rotational.analytics.whites_test import run_whites_reality_check
 # Configuration
 INITIAL_CAPITAL = 1_000_000.0
 RF              = 0.02
-
 REGIMES = [
     {"name": "1_GFC",    "start": "2005-01-01", "end": "2010-12-31", "title": "(2005–2010: GFC & Recovery)"},
     {"name": "2_Bull",   "start": "2011-01-01", "end": "2019-12-31", "title": "(2011–2019: The Long Bull)"},
     {"name": "3_Modern", "start": "2020-01-01", "end": "2024-12-31", "title": "(2020–2024: Pandemic & Inflation)"},
 ]
+
+# Path Resolution
+PLOT_ROOT = Path(__file__).resolve().parents[1]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("run_regimes")
@@ -49,7 +51,7 @@ logger = logging.getLogger("run_regimes")
 def run_single_regime(name, start, end, title, prices, volume):
     logger.info(f"\n>>> ANALYSING REGIME: {name} [{start} to {end}]")
     
-    out_dir = Path("plots") / f"regime_{name}"
+    out_dir = PLOT_ROOT / "plots" / f"regime_{name}"
     out_dir.mkdir(parents=True, exist_ok=True)
     
     # 1. Build Regime
