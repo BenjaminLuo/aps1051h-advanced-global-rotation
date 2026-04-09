@@ -93,18 +93,16 @@ class LadderEngine:
 
     TRANCHE_LABELS = ["A", "B", "C", "D"]
 
-    def __init__(
-        self,
-        initial_capital:  float         = 1_000_000.0,
-        n_tranches:        int           = 4,
         slippage:          float         = DEFAULT_SLIPPAGE,
         commission:        float         = DEFAULT_COMMISSION,
+        execution_lag:     int           = 0,
         asset_classes:     dict[str, list[str]] | None = None,
     ) -> None:
         self.initial_capital = initial_capital
         self.n_tranches      = n_tranches
         self.slippage        = slippage
         self.commission      = commission
+        self.execution_lag   = execution_lag
         self.labels          = self.TRANCHE_LABELS[:n_tranches]
         # Track arbitrary asset categories (e.g., US Equities, Bonds, etc.)
         self._asset_classes = {
@@ -158,26 +156,36 @@ class LadderEngine:
         weekly_rows:  list[dict] = []
         daily_rows:   list[dict] = []
 
-        # ── Pre-build the rotation schedule ───────────────────────────
-        #    init_friday:  ALL tranches buy simultaneously (no sell)
-        #    subsequent Fridays: one tranche rotates per cycle
+        # ── Pre-build the rebalance schedule ───────────────────────────
+        #    Signal is generated on signal_friday.
+        #    Trade occurs on execution_date (signal_friday + lag).
         sel_dates    = oos_sel.index.tolist()
-        init_friday  = sel_dates[0]
-        ladder_dates = sel_dates[1:]   # these are the rotating rebalances
+        bday_index   = oos_prices.index.tolist()
 
-        # Map each ladder Friday → the tranche that will rotate on it
-        rotation_map: dict[pd.Timestamp, str] = {
-            friday: self.labels[i % self.n_tranches]
-            for i, friday in enumerate(ladder_dates)
-        }
-
-        # ── Build a set of rebalance dates for O(1) lookup ────────────
-        rebalance_dates = set(rotation_map.keys()) | {init_friday}
+        # Map execution_date → {tranche_label, signal_date}
+        exec_map: dict[pd.Timestamp, dict] = {}
+        
+        for i, signal_dt in enumerate(sel_dates):
+            # Find the execution date (current or next N business days)
+            try:
+                sig_idx  = bday_index.index(signal_dt)
+                exec_idx = sig_idx + self.execution_lag
+                if exec_idx >= len(bday_index):
+                    continue
+                exec_dt = bday_index[exec_idx]
+                
+                # First Friday (init) vs subsequent rotations
+                if i == 0:
+                    exec_map[exec_dt] = {"type": "INIT", "sig_date": signal_dt}
+                else:
+                    lbl = self.labels[(i-1) % self.n_tranches] # (i-1) because i=0 was init
+                    exec_map[exec_dt] = {"type": "REBAL", "sig_date": signal_dt, "tranche": lbl}
+            except ValueError:
+                continue
 
         logger.info(
-            "Ladder configured: capital=$%s  tranches=%d  init=%s  OOS Fridays=%d",
-            f"{self.initial_capital:,.0f}", self.n_tranches,
-            init_friday.date(), len(sel_dates),
+            "Ladder configured: capital=$%s  tranches=%d  lag=%d  OOS Fridays=%d",
+            f"{self.initial_capital:,.0f}", self.n_tranches, self.execution_lag, len(sel_dates),
         )
 
         # ── Main loop: iterate every trading day ──────────────────────
@@ -186,40 +194,40 @@ class LadderEngine:
             close_row = oos_prices.loc[date].to_dict()
 
             # ── Rebalance logic ────────────────────────────────────────
-            if date == init_friday:
-                # INITIALIZATION SWEEP — all tranches buy, nothing sold
-                tickers = self._tickers(oos_sel.loc[date])
-                for lbl in self.labels:
-                    buys = tranches[lbl].invest_equal_weight(
+            if date in exec_map:
+                event = exec_map[date]
+                sig_dt = event["sig_date"]
+                tickers = self._tickers(oos_sel.loc[sig_dt])
+                
+                if event["type"] == "INIT":
+                    # INITIALIZATION SWEEP — all tranches buy
+                    for lbl in self.labels:
+                        buys = tranches[lbl].invest_equal_weight(
+                            tickers, close_row, self.slippage, self.commission
+                        )
+                        for t in buys:
+                            all_trades.append({"date": date, "event": "INIT", **t})
+                    weekly_rows.append(
+                        self._weekly_row(tranches, close_row, date, "INIT", tickers)
+                    )
+                else:
+                    # REGULAR REBALANCE — active tranche rotates
+                    active_lbl = event["tranche"]
+                    active = tranches[active_lbl]
+                    
+                    sells = active.liquidate(close_row, self.slippage, self.commission)
+                    for t in sells:
+                        all_trades.append({"date": date, "event": "REBAL", **t})
+                        
+                    buys = active.invest_equal_weight(
                         tickers, close_row, self.slippage, self.commission
                     )
                     for t in buys:
-                        all_trades.append({"date": date, "event": "INIT", **t})
-                weekly_rows.append(
-                    self._weekly_row(tranches, close_row, date, "INIT", tickers)
-                )
-
-            elif date in rotation_map:
-                # REGULAR REBALANCE — active tranche rotates to new signal
-                active_lbl = rotation_map[date]
-                active     = tranches[active_lbl]
-                tickers    = self._tickers(oos_sel.loc[date])
-
-                # 1. Liquidate all existing holdings in the active tranche
-                sells = active.liquidate(close_row, self.slippage, self.commission)
-                for t in sells:
-                    all_trades.append({"date": date, "event": "REBAL", **t})
-
-                # 2. Reinvest at equal weight in the new top-3
-                buys = active.invest_equal_weight(
-                    tickers, close_row, self.slippage, self.commission
-                )
-                for t in buys:
-                    all_trades.append({"date": date, "event": "REBAL", **t})
-
-                weekly_rows.append(
-                    self._weekly_row(tranches, close_row, date, active_lbl, tickers)
-                )
+                        all_trades.append({"date": date, "event": "REBAL", **t})
+                        
+                    weekly_rows.append(
+                        self._weekly_row(tranches, close_row, date, active_lbl, tickers)
+                    )
 
             # ── Daily M2M snapshot (taken AFTER any trades) ────────────
             daily_rows.append(self._daily_row(tranches, close_row, date))

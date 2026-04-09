@@ -143,6 +143,24 @@ The system's performance is structurally different across market epochs:
 
 ---
 
+## 🏛 Academic Rigor & Disclosures
+
+To ensure the highest standard of backtesting integrity, the following institutional constraints are built into the simulation:
+
+### 1. Zero Look-Ahead Bias
+- **Fundamental Lag**: All balance-sheet data is lagged by **45 calendar days** to account for standard quarterly reporting cycles.
+- **Reporting Resolution**: If a data release lands on a weekend, it is only made available to the system on the following Monday.
+
+### 2. Execution & Market Impact
+- **MOC Assumption**: By default, rebalances execute at the Friday close price. This assumes **Market-on-Close (MOC)** order entry.
+- **Transaction Costs**: Every trade incurs a **2 bps slippage** buffer and a **$0.005/share commission** to simulate bid-ask spread and broker fees.
+- **Execution Lag Toggle**: The `LadderEngine` supports an optional `execution_lag` parameter (e.g., set to `1` to simulate trading at Monday's open) for "Bulletproof" validation.
+
+### 3. Survivorship Bias
+- **Disclaimer**: This backtest utilizes the **current (2024)** SPY Top-10 / sector ETF universe. ETFs that were active in 2005 but subsequently delisted are not included. This is a structural limitation of public data sources and may slightly overstate historical returns by 0.5%–1.0%.
+
+---
+
 ## ⚖️ License
 
 Distributed under the **MIT License**. See `LICENSE` for more information.
