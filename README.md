@@ -13,7 +13,7 @@ The **Janus Rotational System** is a high-performance algorithmic trading engine
 - **Double-Filter Macro Regime Switch**: Combines fundamental health (Altman Z-Score & Piotroski F-Score) with technical trend-following (200-day SMA).
 - **Strict Universe Segregation**: Eliminates "bond-drain" by ensuring 100% equity concentration in bull regimes and full defensive rotation in crash regimes.
 - **Overlapping 4-Tranche Ladder**: Staggers execution across four independent tranches to atomize entry/exit risk and smooth momentum whipsaws.
-- **Statistical Validation**: Built-in **White's Reality Check** (bootstrap test) to ensure Alpha is statistically significant against random selection benchmarks.
+- **Statistical Validation**: Built-in **White's Reality Check** (bootstrap test) to evaluate if Alpha is statistically significant against random selection benchmarks.
 
 ---
 
@@ -67,6 +67,7 @@ Summary of strategy performance across the total 20-year dataset and partitioned
 | **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
 | **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
 | **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
+| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- |
 
 *Detailed breakdowns and visual reports for each regime are available in the `/plots` subdirectories.*
 
@@ -118,6 +119,7 @@ The system is modularized into steps for transparency:
 | **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
 | **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
 | **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
+| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- |
 
 ---
 
