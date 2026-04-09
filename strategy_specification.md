@@ -59,7 +59,7 @@ The system is evaluated on four primary vectors:
 
 | Metric | Target | Rationale |
 | :--- | :--- | :--- |
-| **CAGR** | > SPY | Demonstrating capital appreciation capability. |
+| **CAGR** | > SPY / 60-40 | Demonstrating capital appreciation capability. |
 | **Max Drawdown** | < -30% (in GFC) | Validating the effectiveness of the defensive rotation. |
 | **Sharpe Ratio** | > 0.40 | Efficiency of returns relative to volatility. |
 | **p-value** | < 0.05 | Statistical proof of strategy robustness (Target level). |

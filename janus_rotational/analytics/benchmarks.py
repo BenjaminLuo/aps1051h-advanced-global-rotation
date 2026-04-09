@@ -47,19 +47,17 @@ def build_6040_benchmark(
     end:             str,
 ) -> pd.Series:
     """
-    60% ACWI + 40% BND daily-weighted buy-and-hold.
+    60% SPY + 40% BIL (Risk-Free) daily-weighted buy-and-hold.
 
-    Fetches ACWI and BND from yfinance (auto_adjust=True for total return).
-    Returns are blended at constant 60/40 weight each day — this is
-    mathematically equivalent to continuous rebalancing and is the standard
-    methodology for balanced benchmark reporting.
+    This provides a cleaner 'Capital Markets Line' benchmark.
+    Returns are blended at constant 60/40 weight each day.
 
-    ACWI: iShares MSCI ACWI ETF  (launched 2008-01-08)
-    BND:  Vanguard Total Bond ETF (launched 2007-04-10)
+    SPY: S&P 500 ETF (Full history)
+    BIL: 1-3 Month T-Bill ETF (Launched 2007, proxy with SHY before)
     """
-    logger.info("Fetching ACWI, BND, AGG, SPY for 60/40 benchmark proxies [%s → %s]", start, end)
+    logger.info("Fetching SPY, BIL, SHY for 60/40 benchmark [%s → %s]", start, end)
     raw = yf.download(
-        ["ACWI", "BND", "AGG", "SPY"],
+        ["SPY", "BIL", "SHY"],
         start=start, end=end,
         auto_adjust=True,
         progress=False,
@@ -71,30 +69,22 @@ def build_6040_benchmark(
     prices_bm = prices_bm.ffill()
 
     # ── Calculate returns and stitch at the return level ───────────────
-    # We calculate returns for EACH asset separately first.
-    # We then fill NAs in the primary series (ACWI/BND) with the proxy series (SPY/AGG).
-    # This prevents 'Price Jumps' when switching from proxy to primary.
+    spy_rets = prices_bm["SPY"].pct_change()
+    shy_rets = prices_bm["SHY"].pct_change()
     
-    spy_rets  = prices_bm["SPY"].pct_change()
-    agg_rets  = prices_bm["AGG"].pct_change()
-    
-    if "ACWI" in prices_bm.columns:
-        acwi_rets = prices_bm["ACWI"].pct_change().fillna(spy_rets)
+    if "BIL" in prices_bm.columns:
+        # Use BIL if available, otherwise SHY
+        rf_rets = prices_bm["BIL"].pct_change().fillna(shy_rets)
     else:
-        acwi_rets = spy_rets
-
-    if "BND" in prices_bm.columns:
-        bnd_rets = prices_bm["BND"].pct_change().fillna(agg_rets)
-    else:
-        bnd_rets = agg_rets
+        rf_rets = shy_rets
 
     # Blend at 60/40
-    port_rets = 0.60 * acwi_rets + 0.40 * bnd_rets
+    port_rets = 0.60 * spy_rets + 0.40 * rf_rets
     port_rets = port_rets.dropna()
 
     curve = initial_capital * (1.0 + port_rets).cumprod()
     # Prepend initial capital on the first valid index day
     t0 = pd.Series([initial_capital], index=[port_rets.index[0] - pd.Timedelta(days=1)], name=curve.name)
     curve = pd.concat([t0, curve])
-    curve.name = "60/40 ACWI/BND"
+    curve.name = "60/40 SPY/RiskFree"
     return curve
