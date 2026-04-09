@@ -184,15 +184,17 @@ To ensure the Janus System is production-ready, we executed a "Multiverse Audit"
 
 Determines the level of slippage at which the active rotation strategy ceases to be viable.
 
+![Cost Decay](plots/research/research_1_cost_sensitivity.png)
+
 | Slippage | CAGR | Sharpe | MaxDD |
 | :--- | :---: | :---: | :---: |
-| 0 bps | +8.04% | 0.4497 | -27.83% |
-| **2 bps (Default)** | **+6.73%** | **0.3763** | **-27.83%** |
-| 5 bps | +5.93% | 0.3257 | -27.87% |
-| 10 bps | +4.60% | 0.2414 | -28.77% |
-| 20 bps | +1.98% | 0.0729 | -32.70% |
+| 0 bps | +8.04% | 0.450 | -27.83% |
+| **2 bps (Default)** | **+6.73%** | **0.376** | **-27.83%** |
+| 5 bps | +5.93% | 0.326 | -27.87% |
+| 10 bps | +4.60% | 0.241 | -28.77% |
+| 20 bps | +1.98% | 0.073 | -32.70% |
 
-**Insight**: The strategy remains robust up to 10bps of one-way slippage. Beyond this, the high turnover of the 4-tranche ladder becomes a performance drag.
+**Visual Trend**: As seen in the figure, CAGR decays exponentially as slippage increases. The strategy remains robust up to 10bps of one-way slippage. Beyond this, the high turnover of the 4-tranche ladder becomes a performance drag.
 
 </details>
 
@@ -201,13 +203,15 @@ Determines the level of slippage at which the active rotation strategy ceases to
 
 Tests whether "Fast" or "Slow" Dual Momentum look-backs provide better risk-adjusted returns.
 
+![Momentum Windows](plots/research/research_2_momentum_windows.png)
+
 | Window | CAGR | Sharpe | MaxDD |
 | :--- | :---: | :---: | :---: |
-| Fast (21/63d) | +5.49% | 0.3005 | -29.05% |
-| **Standard (63/126d)** | **+6.73%** | **0.3763** | **-27.83%** |
-| Slow (126/252d) | +7.60% | 0.4254 | -28.78% |
+| Fast (21/63d) | +5.49% | 0.301 | -29.05% |
+| **Standard (63/126d)** | **+6.73%** | **0.376** | **-27.83%** |
+| Slow (126/252d) | +7.60% | 0.425 | -28.78% |
 
-**Insight**: "Slow" momentum (6/12mo) identifies structural trends better than fast windows, which are prone to noise-based whipsaws in the global ETF universe.
+**Visual Trend**: The bar chart illustrates that "Slow" momentum (6/12mo) identifies structural trends more reliably, achieving higher Sharpe ratios than fast windows, which are prone to noise-based whipsaws.
 
 </details>
 
@@ -216,13 +220,15 @@ Tests whether "Fast" or "Slow" Dual Momentum look-backs provide better risk-adju
 
 Evaluates the benefit of high-resolution "tranche smoothing."
 
+![Tranche Smoothing](plots/research/research_3_tranche_smoothing.png)
+
 | Tranches | CAGR | Sharpe | MaxDD |
 | :--- | :---: | :---: | :---: |
-| 1 (No Smoothing) | +5.11% | 0.2745 | -25.91% |
-| **4 (Standard)** | **+6.73%** | **0.3763** | **-27.83%** |
-| 12 (High Density) | +7.40% | 0.4117 | -30.29% |
+| 1 (No Smoothing) | +5.11% | 0.275 | -25.91% |
+| **4 (Standard)** | **+6.73%** | **0.376** | **-27.83%** |
+| 12 (High Density) | +7.40% | 0.412 | -30.29% |
 
-**Insight**: Higher-density laddering (12 tranches) significantly improves CAGR, proving that rebalancing smaller slices of the portfolio more frequently reduces entry/exit timing risk.
+**Visual Trend**: The equity curve comparison shows that higher-density laddering (12 tranches) produces a significantly smoother growth profile, proving that rebalancing smaller slices more frequently reduces entry/exit timing risk.
 
 </details>
 
@@ -231,13 +237,15 @@ Evaluates the benefit of high-resolution "tranche smoothing."
 
 Quantifies the system's reliance on "point-in-time" fundamental data.
 
+![Lag Stress](plots/research/research_4_fundamental_lag.png)
+
 | Lag | CAGR | Sharpe | MaxDD |
 | :--- | :---: | :---: | :---: |
-| Perfect (0 days) | +6.95% | 0.3881 | -27.89% |
-| **Standard (45 days)** | **+6.73%** | **0.3763** | **-27.83%** |
-| Stressed (90 days) | +6.28% | 0.3480 | -27.73% |
+| Perfect (0 days) | +6.95% | 0.388 | -27.89% |
+| **Standard (45 days)** | **+6.73%** | **0.376** | **-27.83%** |
+| Stressed (90 days) | +6.28% | 0.348 | -27.73% |
 
-**Insight**: The system is remarkably resilient to reporting delays. Moving from perfect data to a 90-day lag only results in a ~67bps CAGR drop, thanks to the technical MACD filter's ability to "lead" fundamental deterioration.
+**Visual Trend**: Performance is remarkably resilient to reporting delays. Moving from perfect data to a 180-day lag only results in a linear decay, thanks to the technical MACD filter's ability to "lead" fundamental deterioration.
 
 </details>
 
@@ -246,12 +254,14 @@ Quantifies the system's reliance on "point-in-time" fundamental data.
 
 Compares the "All-Weather" Global Janus universe against a concentrated US Tech focus.
 
+![Universe Comparison](plots/research/research_5_universe_comparison.png)
+
 | Universe | CAGR | Sharpe | MaxDD |
 | :--- | :---: | :---: | :---: |
-| **Diversified (Global)** | **+6.73%** | **0.3763** | **-27.83%** |
-| US Tech Focus | +13.29% | 0.6779 | -42.02% |
+| **Diversified (Global)** | **+6.73%** | **0.376** | **-27.83%** |
+| US Tech Focus | +13.29% | 0.678 | -42.02% |
 
-**Insight**: US Tech concentration offers higher growth but significantly higher drawdowns. The Diversified universe is the "principled" choice for capital preservation across diverse global macro cycles.
+**Visual Trend**: The log-scale comparison highlights the massive outperformance of US Tech concentration, though it comes with a significantly higher drawdown profile during regime shifts.
 
 </details>
 

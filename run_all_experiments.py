@@ -2,6 +2,8 @@
 import logging
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import os
 from janus_rotational.config import (
     BOND_UNIVERSE, DATA_END, DATA_START, EQUITY_UNIVERSE,
 )
@@ -10,20 +12,20 @@ from janus_rotational.execution.ladder import LadderEngine
 from janus_rotational.regime.macro import build_weekly_regime
 from janus_rotational.signals.selector import build_weekly_selections
 from janus_rotational.analytics.metrics import compute_metrics
-from janus_rotational.analytics.benchmarks import build_6040_benchmark
+
+# ── Setup ──
+OOS_START = "2005-01-01"
+OOS_END = "2024-12-31"
+INITIAL_CAPITAL = 1_000_000.0
+PLOTS_DIR = "plots/research/"
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
 # ── Suppression ──
 logging.basicConfig(level=logging.ERROR)
 import warnings
 warnings.filterwarnings("ignore")
 
-# ── Setup ──
-OOS_START = "2005-01-01"
-OOS_END = "2024-12-31"
-INITIAL_CAPITAL = 1_000_000.0
-
-print("... Initializing data for Multiverse Research ...")
-# Expanded universe to include individual stocks for Experiment 5
+print("... Initializing Research Suite ...")
 EXTENDED_EQUITY = list(EQUITY_UNIVERSE) + ["NVDA", "AAPL"]
 universes = fetch_equity_and_bond(EXTENDED_EQUITY, BOND_UNIVERSE, DATA_START, DATA_END)
 eq_prices, eq_vol = universes["equity"]
@@ -41,15 +43,12 @@ def run_backtest(
     equity_list=EQUITY_UNIVERSE,
     bond_list=BOND_UNIVERSE
 ):
-    # 1. Regime
     regime = build_weekly_regime(start=DATA_START, end=DATA_END, prices=prices, lag_days=lag_days)
-    # 2. Selections
     sel = build_weekly_selections(
         prices=prices, volume=volume, regime=regime,
         equity_universe=equity_list, bond_universe=bond_list,
         momentum_short=mom_short, momentum_long=mom_long
     )
-    # 3. Execution
     engine = LadderEngine(
         initial_capital=INITIAL_CAPITAL,
         execution_lag=1,
@@ -58,81 +57,150 @@ def run_backtest(
         commission=commission
     )
     res = engine.run(prices=prices, selections=sel, start=OOS_START, end=OOS_END)
-    return compute_metrics(res.daily["portfolio_value"])
+    # Return both metrics and the equity curve
+    curve = res.daily["portfolio_value"]
+    return compute_metrics(curve), curve
 
-# ── EXPERIMENT 1: Cost Breakeven ──
-print("\n[Exp 1] Running Cost Breakeven Analysis...")
-cost_results = []
-for slip in [0.0, 0.0002, 0.0005, 0.0010, 0.0020]:
-    m = run_backtest(slippage=slip)
-    cost_results.append({"Slippage": f"{slip*10000:.0f} bps", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
-
-# ── EXPERIMENT 2: Momentum Sensitivity ──
-print("[Exp 2] Running Momentum Sensitivity Analysis...")
-mom_results = []
-for short, long in [(21, 63), (63, 126), (126, 252)]:
-    m = run_backtest(mom_short=short, mom_long=long)
-    mom_results.append({"Window": f"{short}/{long}d", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
-
-# ── EXPERIMENT 3: Tranche Smoothing ──
-print("[Exp 3] Running Tranche Smoothing Analysis...")
-tranche_results = []
-for n in [1, 4, 12]:
-    m = run_backtest(n_tranches=n)
-    tranche_results.append({"Tranches": n, "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
-
-# ── EXPERIMENT 4: Macro Lag Stress ──
-print("[Exp 4] Running Macro Lag Stress Analysis...")
-lag_results = []
-for lag in [0, 45, 90]:
-    m = run_backtest(lag_days=lag)
-    lag_results.append({"Lag": f"{lag} days", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
-
-# ── EXPERIMENT 5: Universe Utility ──
-print("[Exp 5] Running Universe Utility Analysis...")
-US_TECH = ["SPY", "QQQ", "XLK", "NVDA", "AAPL"] # Proxy for US Tech Focus
-uni_results = []
-# Standard (Diversified)
-m_div = run_backtest()
-uni_results.append({"Universe": "Diversified (30)", "CAGR": m_div['cagr'], "Sharpe": m_div['sharpe'], "MaxDD": m_div['max_drawdown']})
-# US Tech Focus
-m_tech = run_backtest(equity_list=US_TECH)
-uni_results.append({"Universe": "US Tech Focus", "CAGR": m_tech['cagr'], "Sharpe": m_tech['sharpe'], "MaxDD": m_tech['max_drawdown']})
-
-# ── Final Reporting ──
-def to_md(results, title):
-    if not results:
-        return
+# ── [Exp 1] Cost Sensitivity ──
+def exp_cost():
+    print("\n[Exp 1] Cost Breakeven Analysis...")
+    slips = [0.0, 0.0002, 0.0005, 0.0010, 0.0020, 0.0050]
+    results = []
+    curves = []
+    for s in slips:
+        m, c = run_backtest(slippage=s)
+        results.append({"Slippage": f"{s*10000:.0f} bps", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
+        curves.append(c.rename(f"{s*10000:.0f} bps"))
     
+    # Plot cost decay
+    plt.figure(figsize=(10, 6))
+    for c in curves:
+        plt.plot(c.index, c.values / 1e6, label=c.name)
+    plt.title("Cost Impact on Portfolio Growth (Log Scale)")
+    plt.yscale('log')
+    plt.ylabel("Portfolio Value ($M)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}research_1_cost_sensitivity.png")
+    plt.close()
+    return results
+
+# ── [Exp 2] Momentum Sensitivity ──
+def exp_mom():
+    print("[Exp 2] Momentum Sensitivity Analysis...")
+    windows = [(21, 63), (63, 126), (126, 252)]
+    results = []
+    for s, l in windows:
+        m, _ = run_backtest(mom_short=s, mom_long=l)
+        results.append({"Window": f"{s}/{l}d", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
+    
+    # Plot bar chart for CAGR vs Sharpe
+    df = pd.DataFrame(results)
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+    ax2 = ax1.twinx()
+    
+    x = np.arange(len(df))
+    width = 0.35
+    
+    ax1.bar(x - width/2, df['CAGR'], width, color='skyblue', label='CAGR')
+    ax2.bar(x + width/2, df['Sharpe'], width, color='orange', label='Sharpe', alpha=0.7)
+    
+    ax1.set_ylabel('CAGR (%)', color='skyblue')
+    ax2.set_ylabel('Sharpe Ratio', color='orange')
+    plt.xticks(x, df['Window'])
+    plt.title("Momentum Window Comparison")
+    plt.grid(True, axis='y', alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}research_2_momentum_windows.png")
+    plt.close()
+    return results
+
+# ── [Exp 3] Tranche Smoothing ──
+def exp_smoothing():
+    print("[Exp 3] Tranche Smoothing Analysis...")
+    tranches = [1, 4, 12]
+    results = []
+    curves = []
+    for n in tranches:
+        m, c = run_backtest(n_tranches=n)
+        results.append({"Tranches": n, "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
+        curves.append(c.rename(f"{n} Tranches"))
+    
+    plt.figure(figsize=(10, 6))
+    for c in curves:
+        plt.plot(c.index, c.values / 1e6, label=c.name)
+    plt.title("Effect of Laddered Smoothing on Equity Curve")
+    plt.yscale('log')
+    plt.ylabel("Portfolio Value ($M)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}research_3_tranche_smoothing.png")
+    plt.close()
+    return results
+
+# ── [Exp 4] Macro Lag Stress ──
+def exp_lag():
+    print("[Exp 4] Macro Lag Stress Analysis...")
+    lags = [0, 45, 90, 180]
+    results = []
+    for l in lags:
+        m, _ = run_backtest(lag_days=l)
+        results.append({"Lag": f"{l} days", "CAGR": m['cagr'], "Sharpe": m['sharpe'], "MaxDD": m['max_drawdown']})
+    
+    df = pd.DataFrame(results)
+    plt.figure(figsize=(10, 6))
+    plt.plot(lags, df['CAGR'] * 100, marker='o', color='red', label='CAGR')
+    plt.title("Performance Sensitivity to Reporting Lag")
+    plt.xlabel("Reporting Lag (Days)")
+    plt.ylabel("CAGR (%)")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}research_4_fundamental_lag.png")
+    plt.close()
+    return results
+
+# ── [Exp 5] Universe Utility ──
+def exp_universe():
+    print("[Exp 5] Universe Utility Analysis...")
+    results = []
+    # Standard
+    m_div, c_div = run_backtest()
+    results.append({"Universe": "Diversified (Global)", "CAGR": m_div['cagr'], "Sharpe": m_div['sharpe'], "MaxDD": m_div['max_drawdown']})
+    # Tech focus
+    tech_universe = ["SPY", "QQQ", "XLK", "NVDA", "AAPL"]
+    m_tech, c_tech = run_backtest(equity_list=tech_universe)
+    results.append({"Universe": "US Tech Focus", "CAGR": m_tech['cagr'], "Sharpe": m_tech['sharpe'], "MaxDD": m_tech['max_drawdown']})
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(c_div.index, c_div.values / 1e6, label="Global Diversification")
+    plt.plot(c_tech.index, c_tech.values / 1e6, label="US Tech Concentration")
+    plt.title("Alpha Comparison: Diversification vs Concentrated Tech")
+    plt.yscale('log')
+    plt.ylabel("Portfolio Value ($M)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}research_5_universe_comparison.png")
+    plt.close()
+    return results
+
+def to_md(results): # simplified for console output
     keys = list(results[0].keys())
-    
-    # Headers
-    header = f"\n### {title}\n\n| {' | '.join(keys)} |"
+    header = f"| {' | '.join(keys)} |"
     sep    = f"| {' | '.join(['---'] * len(keys))} |"
-    
-    # Rows
-    rows = []
-    for r in results:
-        row_vals = []
-        for k in keys:
-            val = r[k]
-            if isinstance(val, float):
-                if k in ['CAGR', 'MaxDD']:
-                    val = f"{val:+.2%}"
-                elif k == 'Sharpe':
-                    val = f"{val:.4f}"
-            row_vals.append(str(val))
-        rows.append(f"| {' | '.join(row_vals)} |")
-    
     print(header)
     print(sep)
-    print("\n".join(rows))
+    for r in results:
+        v = [str(r[k]) if not isinstance(r[k], float) else f"{r[k]:+.2%}" if 'Sharpe' not in k else f"{r[k]:.3f}" for k in keys]
+        print(f"| {' | '.join(v)} |")
 
-print("\n" + "="*80)
-print("RESEARCH REPORT: ROBUSTNESS & SENSITIVITY")
-print("="*80)
-to_md(cost_results, "Cost Breakeven (Friction vs. CAGR)")
-to_md(mom_results, "Momentum Windows (Speed vs. Stability)")
-to_md(tranche_results, "Laddering Config (Smoothing vs. Latency)")
-to_md(lag_results, "Fundamental Reporting Lag Stress")
-to_md(uni_results, "Universe Composition Utility")
+# ── Execution ──
+c_res = exp_cost()
+m_res = exp_mom()
+s_res = exp_smoothing()
+l_res = exp_lag()
+u_res = exp_universe()
+
+print("\n... All Research Figures Generated in plots/research/ ...")
