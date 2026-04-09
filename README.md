@@ -62,12 +62,12 @@ The system demonstrated a robust **-22.9% maximum drawdown** in both scenarios d
 
 Summary of strategy performance across the total 20-year dataset and partitioned market regimes.
 
-| Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
-| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
-| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
-| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- |
+| Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) | 60/40 (Full) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% | +7.21% |
+| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 | 0.366 |
+| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% | -38.43% |
+| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- | -- |
 
 *Detailed breakdowns and visual reports for each regime are available in the `/plots` subdirectories.*
 
@@ -114,12 +114,12 @@ The system is modularized into steps for transparency:
 
 ---
 
-| Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
-| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
-| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
-| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- |
+| Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) | 60/40 (Full) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% | +7.21% |
+| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 | 0.366 |
+| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% | -38.43% |
+| **White's RC (p)** | **0.480** | **0.088** | 0.684 | 0.668 | -- | -- |
 
 ---
 

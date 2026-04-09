@@ -70,29 +70,31 @@ def build_6040_benchmark(
     ) else prices_bm.columns
     prices_bm = prices_bm.ffill()
 
-    # ── Handle missing BND (launch 2007) and ACWI (launch 2008) ────────
-    # BND fallback: Use AGG (iShares Core US Aggregate Bond - launch 2003)
-    if "BND" in prices_bm.columns:
-        if "AGG" in prices_bm.columns:
-            prices_bm["BND_proxy"] = prices_bm["BND"].combine_first(prices_bm["AGG"])
-        else:
-            prices_bm["BND_proxy"] = prices_bm["BND"]
-    else:
-        prices_bm["BND_proxy"] = prices_bm["AGG"]
-
-    # ACWI fallback: Use SPY (US Equity) for global proxy before 2008
+    # ── Calculate returns and stitch at the return level ───────────────
+    # We calculate returns for EACH asset separately first.
+    # We then fill NAs in the primary series (ACWI/BND) with the proxy series (SPY/AGG).
+    # This prevents 'Price Jumps' when switching from proxy to primary.
+    
+    spy_rets  = prices_bm["SPY"].pct_change()
+    agg_rets  = prices_bm["AGG"].pct_change()
+    
     if "ACWI" in prices_bm.columns:
-        prices_bm["ACWI_proxy"] = prices_bm["ACWI"].combine_first(prices_bm["SPY"])
+        acwi_rets = prices_bm["ACWI"].pct_change().fillna(spy_rets)
     else:
-        prices_bm["ACWI_proxy"] = prices_bm["SPY"]
+        acwi_rets = spy_rets
 
-    # Calculate returns using proxies
-    rets = prices_bm[["ACWI_proxy", "BND_proxy"]].pct_change().dropna()
-    port_rets = 0.60 * rets["ACWI_proxy"] + 0.40 * rets["BND_proxy"]
+    if "BND" in prices_bm.columns:
+        bnd_rets = prices_bm["BND"].pct_change().fillna(agg_rets)
+    else:
+        bnd_rets = agg_rets
+
+    # Blend at 60/40
+    port_rets = 0.60 * acwi_rets + 0.40 * bnd_rets
+    port_rets = port_rets.dropna()
 
     curve = initial_capital * (1.0 + port_rets).cumprod()
     # Prepend initial capital on the first valid index day
-    t0 = pd.Series([initial_capital], index=[rets.index[0] - pd.Timedelta(days=1)], name=curve.name)
+    t0 = pd.Series([initial_capital], index=[port_rets.index[0] - pd.Timedelta(days=1)], name=curve.name)
     curve = pd.concat([t0, curve])
     curve.name = "60/40 ACWI/BND"
     return curve
