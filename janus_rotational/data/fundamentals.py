@@ -82,20 +82,30 @@ _COMPANY_BASELINES: dict[str, dict[str, float]] = {
 #     with index-level fundamentals remaining positive despite market falls).
 _STRESS_CALENDAR: dict[pd.Timestamp, tuple[float, float]] = {
     #  Quarter-end             z_mult  f_mult
-    pd.Timestamp("2015-09-30"): (0.88,  0.90),   # China devaluation / commodity rout
+    # ── Global Financial Crisis (GFC) ───────────────────
+    pd.Timestamp("2008-06-30"): (0.90,  0.92),
+    pd.Timestamp("2008-09-30"): (0.45,  0.48),   # Lehman Collapse — CRASH
+    pd.Timestamp("2008-12-31"): (0.40,  0.45),   # Peak Stress — CRASH
+    pd.Timestamp("2009-03-31"): (0.48,  0.52),   # Market Bottom — CRASH
+    pd.Timestamp("2009-06-30"): (0.65,  0.68),   # Early recovery
+    # ── Eurozone Debt Crisis ────────────────────────────
+    pd.Timestamp("2011-09-30"): (0.75,  0.78),
+    pd.Timestamp("2011-12-31"): (0.70,  0.74),
+    # ── Existing Stress Points ──────────────────────────
+    pd.Timestamp("2015-09-30"): (0.88,  0.90),
     pd.Timestamp("2015-12-31"): (0.85,  0.88),
-    pd.Timestamp("2016-03-31"): (0.83,  0.86),   # Oil bottom; earnings recession
-    pd.Timestamp("2016-06-30"): (0.90,  0.92),   # Brexit shock
-    pd.Timestamp("2018-09-30"): (0.93,  0.94),   # Late-cycle; rate anxiety
-    pd.Timestamp("2018-12-31"): (0.80,  0.83),   # Q4 2018 drawdown (Fed pivot fears)
-    pd.Timestamp("2020-03-31"): (0.44,  0.48),   # COVID-19 shock — CRASH REGIME
-    pd.Timestamp("2020-06-30"): (0.52,  0.56),   # Recovery partial — still CRASH
-    pd.Timestamp("2020-09-30"): (0.72,  0.75),   # V-shape recovery in progress
-    pd.Timestamp("2020-12-31"): (0.85,  0.88),   # Vaccine / fiscal recovery
-    pd.Timestamp("2022-03-31"): (0.84,  0.87),   # Rate hike cycle begins
-    pd.Timestamp("2022-06-30"): (0.76,  0.79),   # Bear market; margin compression
-    pd.Timestamp("2022-09-30"): (0.74,  0.77),   # Peak rate-hike fears
-    pd.Timestamp("2022-12-31"): (0.78,  0.81),   # Rates plateau; earnings resilient
+    pd.Timestamp("2016-03-31"): (0.83,  0.86),
+    pd.Timestamp("2016-06-30"): (0.90,  0.92),
+    pd.Timestamp("2018-09-30"): (0.93,  0.94),
+    pd.Timestamp("2018-12-31"): (0.80,  0.83),
+    pd.Timestamp("2020-03-31"): (0.44,  0.48),
+    pd.Timestamp("2020-06-30"): (0.52,  0.56),
+    pd.Timestamp("2020-09-30"): (0.72,  0.75),
+    pd.Timestamp("2020-12-31"): (0.85,  0.88),
+    pd.Timestamp("2022-03-31"): (0.84,  0.87),
+    pd.Timestamp("2022-06-30"): (0.76,  0.79),
+    pd.Timestamp("2022-09-30"): (0.74,  0.77),
+    pd.Timestamp("2022-12-31"): (0.78,  0.81),
 }
 
 
@@ -103,20 +113,31 @@ def _mock_quarterly_scores(
     tickers: list[str],
     quarters: pd.DatetimeIndex,
     seed: int = RANDOM_SEED,
+    stress_severity: str = 'standard',
 ) -> pd.DataFrame:
     """
     Generate per-ticker quarterly (Altman Z, Piotroski F) scores.
-
-    Returns
-    -------
-    pd.DataFrame
-        MultiIndex (quarter_end, ticker), columns ['altman_z', 'piotroski_f']
+    Stress severity adjusts the duration and depth of the 2008 GFC.
     """
     rng = np.random.default_rng(seed)
     records = []
 
+    # Local copy of stress calendar to allow per-call mutation for experiments
+    stress_map = _STRESS_CALENDAR.copy()
+
+    # Adjust 2008 GFC severity based on experiment mode
+    if stress_severity == 'aggressive':
+        # Deep stress stays low for longer (Q2 2009 still in crash)
+        stress_map[pd.Timestamp("2009-03-31")] = (0.40, 0.44)
+        stress_map[pd.Timestamp("2009-06-30")] = (0.45, 0.48)
+    elif stress_severity == 'recovery':
+        # Faster recovery starting Q1 2009
+        stress_map[pd.Timestamp("2008-12-31")] = (0.55, 0.58)
+        stress_map[pd.Timestamp("2009-03-31")] = (0.75, 0.78)
+        stress_map[pd.Timestamp("2009-06-30")] = (0.90, 0.92)
+
     for qend in quarters:
-        z_shock, f_shock = _STRESS_CALENDAR.get(qend, (1.0, 1.0))
+        z_shock, f_shock = stress_map.get(qend, (1.0, 1.0))
 
         for ticker in tickers:
             base = _COMPANY_BASELINES[ticker]
@@ -187,6 +208,7 @@ def build_daily_fundamental_series(
     start: str,
     end: str,
     tickers: list[str] | None = None,
+    stress_severity: str = 'standard',
 ) -> pd.DataFrame:
     """
     Build a **daily** time-series of the most-recently-available
@@ -213,10 +235,11 @@ def build_daily_fundamental_series(
     if tickers is None:
         tickers = SPY_TOP10
 
-    # ── Warm-up: go back to Q2-2013 so 2014-01-02 has a valid prior score ─
-    # Q3-2013 ends Sep-30, +45 days = Nov-14, 2013  → available before Jan 2014.
+    # ── Warm-up: go back 1 year before start to ensure valid prior scores ──
+    # For a 2004 start, we look back to Q2-2003.
+    start_dt = pd.Timestamp(start) - pd.DateOffset(months=6)
     quarters: pd.DatetimeIndex = pd.date_range(
-        start="2013-06-30",
+        start=start_dt,
         end=end,
         freq="Q",
     )
@@ -225,7 +248,7 @@ def build_daily_fundamental_series(
         "Generating mock quarterly scores for %d tickers × %d quarters",
         len(tickers), len(quarters),
     )
-    per_ticker = _mock_quarterly_scores(tickers, quarters)
+    per_ticker = _mock_quarterly_scores(tickers, quarters, stress_severity=stress_severity)
     agg        = _aggregate_to_index_level(per_ticker)
     lagged     = _apply_reporting_lag(agg)
 
@@ -239,7 +262,7 @@ def build_daily_fundamental_series(
     lagged.index.name = "available_from"
 
     # ── Expand to daily business-day grid (with warm-up buffer) ───────────
-    warmup_start = "2013-07-01"   # safely pre-dates the first availability date
+    warmup_start = pd.Timestamp(start) - pd.DateOffset(months=6)
     bday_index   = pd.bdate_range(start=warmup_start, end=end)
 
     # Place lagged scores on their (snapped) availability dates

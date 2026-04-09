@@ -39,7 +39,7 @@ SPY_TOP10: list[str] = [
 ]
 
 # ── Data Window ────────────────────────────────────────────────────────────────
-DATA_START: str = "2014-01-01"   # includes 1-year buffer for lookback warmup
+DATA_START: str = "2004-01-01"   # includes 1-year buffer for lookback warmup
 DATA_END:   str = "2024-12-31"
 
 # ── Phase 1 — Macro Regime Switch ─────────────────────────────────────────────

@@ -49,6 +49,7 @@ def build_weekly_regime(
     altman_threshold:    float = ALTMAN_CRASH_THRESHOLD,
     piotroski_threshold: float = PIOTROSKI_CRASH_THRESHOLD,
     sma_window:          int   = SMA_CRASH_WINDOW,
+    stress_severity:     str   = 'standard',
 ) -> pd.DataFrame:
     """
     Build the weekly Friday macro-regime flag (Janus 2.0 double-filter).
@@ -67,6 +68,8 @@ def build_weekly_regime(
         Piotroski F crash threshold.  Default 4.
     sma_window : int
         SMA look-back for the technical filter.  Default 200.
+    stress_severity : str
+        Experiment mode: 'standard', 'aggressive', or 'recovery'.
 
     Returns
     -------
@@ -77,7 +80,7 @@ def build_weekly_regime(
         spy_price, spy_sma_200, technical_crash,
         crash_regime  (= fundamental_crash OR technical_crash)
     """
-    daily = build_daily_fundamental_series(start=start, end=end)
+    daily = build_daily_fundamental_series(start=start, end=end, stress_severity=stress_severity)
 
     fridays_mask = daily.index.weekday == 4
     weekly = daily.loc[fridays_mask].copy()

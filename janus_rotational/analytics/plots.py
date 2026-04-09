@@ -100,6 +100,8 @@ def plot_regime_overlay(
     start:   str,
     end:     str,
     save:    bool = True,
+    output_dir: Path | None = None,
+    title_suffix: str = "",
 ) -> plt.Figure:
     """
     SPY total-return price chart with crash-regime red shading.
@@ -108,7 +110,7 @@ def plot_regime_overlay(
 
     fig, ax = plt.subplots(figsize=(14, 5))
     fig.suptitle(
-        "Figure 1 — SPY Price & Phase 1 Macro Regime Switch (2015–2024)",
+        f"Figure 1 — SPY Price & Macro Regime Switch {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -136,7 +138,9 @@ def plot_regime_overlay(
 
     fig.tight_layout()
     if save:
-        path = PLOT_DIR / "figure_1_regime_overlay.png"
+        base_dir = output_dir if output_dir else PLOT_DIR
+        base_dir.mkdir(exist_ok=True, parents=True)
+        path = base_dir / "figure_1_regime_overlay.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -150,6 +154,8 @@ def plot_capital_allocation(
     daily: pd.DataFrame,
     regime: pd.DataFrame,
     save:   bool = True,
+    output_dir: Path | None = None,
+    title_suffix: str = "",
 ) -> plt.Figure:
     """
     100% stacked area chart of equity (US vs Int) vs bond vs cash allocation.
@@ -168,7 +174,7 @@ def plot_capital_allocation(
 
     fig, ax = plt.subplots(figsize=(14, 5))
     fig.suptitle(
-        "Figure 2 — Granular Capital Allocation: US vs Global vs Bonds (2015–2024)",
+        f"Figure 2 — Granular Capital Allocation {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -198,7 +204,9 @@ def plot_capital_allocation(
 
     fig.tight_layout()
     if save:
-        path = PLOT_DIR / "figure_2_capital_allocation.png"
+        base_dir = output_dir if output_dir else PLOT_DIR
+        base_dir.mkdir(exist_ok=True, parents=True)
+        path = base_dir / "figure_2_capital_allocation.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -215,6 +223,8 @@ def plot_equity_and_drawdown(
     regime:       pd.DataFrame,
     metrics_dict: dict,
     save:         bool = True,
+    output_dir:   Path | None = None,
+    title_suffix: str = "",
 ) -> plt.Figure:
     """
     Top panel: log-scale equity curves (Janus vs SPY vs 60/40).
@@ -226,7 +236,7 @@ def plot_equity_and_drawdown(
     ax2 = fig.add_subplot(gs[1], sharex=ax1)
 
     fig.suptitle(
-        "Figure 3 — Cumulative Equity Curves & Underwater Drawdown (OOS: 2015–2024)",
+        f"Figure 3 — Equity Curves & Underwater Drawdown {title_suffix}",
         **FONT_TITLE,
     )
 
@@ -289,7 +299,9 @@ def plot_equity_and_drawdown(
 
     fig.tight_layout()
     if save:
-        path = PLOT_DIR / "figure_3_equity_drawdown.png"
+        base_dir = output_dir if output_dir else PLOT_DIR
+        base_dir.mkdir(exist_ok=True, parents=True)
+        path = base_dir / "figure_3_equity_drawdown.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -302,6 +314,8 @@ def plot_equity_and_drawdown(
 def plot_whites_test(
     whites_result: dict,
     save:          bool = True,
+    output_dir:    Path | None = None,
+    title_suffix:  str = "",
 ) -> plt.Figure:
     """
     Histogram of naive Sharpe Ratios with the Janus Sharpe marked.
@@ -313,7 +327,7 @@ def plot_whites_test(
 
     fig, ax = plt.subplots(figsize=(10, 6))
     fig.suptitle(
-        "Figure 4 — White's Reality Check: Janus vs Random-Selection Distribution",
+        f"Figure 4 — White's Reality Check {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -369,7 +383,9 @@ def plot_whites_test(
 
     fig.tight_layout()
     if save:
-        path = PLOT_DIR / "figure_4_whites_reality_check.png"
+        base_dir = output_dir if output_dir else PLOT_DIR
+        base_dir.mkdir(exist_ok=True, parents=True)
+        path = base_dir / "figure_4_whites_reality_check.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig

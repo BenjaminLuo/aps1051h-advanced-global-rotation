@@ -49,7 +49,7 @@ from janus_rotational.analytics.plots      import (
     plot_whites_test,
 )
 
-OOS_START       = "2015-01-01"
+OOS_START       = "2005-01-01"
 OOS_END         = "2024-12-31"
 INITIAL_CAPITAL = 1_000_000.0
 RF              = 0.02

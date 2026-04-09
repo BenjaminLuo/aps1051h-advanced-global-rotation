@@ -110,31 +110,49 @@ def run_whites_reality_check(
         n_weeks, n_tickers, n_sims,
     )
 
-    # ── Vectorised simulation ─────────────────────────────────────────────
-    # Draw random ticker indices: shape (n_sims, n_weeks, 3)
-    # rng.integers gives values in [0, n_tickers), no-replacement per row
-    # handled by choice; for large n_tickers vs 3 picks, collisions are rare
-    # but we enforce no-replacement with a shuffle-based approach below.
+    # ── Weekly Simulation Loop ───────────────────────────────────────────
+    # We must handle the "sparse universe" of 2005–2010 where many ETFs
+    # did not yet exist. A static vectorised shuffle would pick NaNs.
     rng = np.random.default_rng(seed)
+    
+    # Pre-build a list of valid indices for each week
+    valid_indices_per_week = [
+        np.where(~np.isnan(weekly_rets[w]))[0]
+        for w in range(n_weeks)
+    ]
 
-    # (n_sims, n_weeks, n_tickers) shuffled indices; take first 3 → no replacement
-    shuffle_idx = np.argsort(rng.random((n_sims, n_weeks, n_tickers)), axis=2)[:, :, :3]
+    sim_port_rets = np.zeros((n_sims, n_weeks))
 
-    # Gather returns: weekly_rets[week, ticker]
-    # row axis (n_sims, n_weeks, 3) → broadcast week index
-    week_idx = np.arange(n_weeks)[np.newaxis, :, np.newaxis]          # (1, n_weeks, 1)
-    sim_rets = weekly_rets[week_idx, shuffle_idx]                      # (n_sims, n_weeks, 3)
+    for w in range(n_weeks):
+        valid_idx = valid_indices_per_week[w]
+        if len(valid_idx) == 0:
+            sim_port_rets[:, w] = 0.0
+            continue
 
-    # Equal-weight: (n_sims, n_weeks)
-    port_rets = sim_rets.mean(axis=2)
+        # For each sim, pick 3 random tickers from the valid ones
+        # If fewer than 3 valid exist, pick all of them
+        n_to_pick = min(3, len(valid_idx))
+        
+        # Performance: draw all sims for this week at once
+        # (n_sims, n_to_pick)
+        picks = [rng.choice(valid_idx, n_to_pick, replace=False) for _ in range(n_sims)]
+        picks = np.array(picks)
 
-    # Annualised Sharpe for all 500 sims at once
-    ann_mean     = port_rets.mean(axis=1) * 52.0 - rf
-    ann_std      = port_rets.std(axis=1)  * np.sqrt(52.0)
-    naive_sharpes = ann_mean / ann_std                                  # (n_sims,)
+        # Gather returns at these indices
+        # weekly_rets[w, picks] -> shape (n_sims, n_to_pick)
+        weekly_vals = weekly_rets[w, picks]
+        sim_port_rets[:, w] = np.mean(weekly_vals, axis=1)
 
-    # Replace any NaN/Inf from zero-variance simulations
-    naive_sharpes = naive_sharpes[np.isfinite(naive_sharpes)]
+    # Annualised Sharpe for all simulations
+    ann_mean      = sim_port_rets.mean(axis=1) * 52.0 - rf
+    ann_std       = sim_port_rets.std(axis=1)  * np.sqrt(52.0)
+    
+    # Avoid div-by-zero if std is 0
+    with np.errstate(divide='ignore', invalid='ignore'):
+        naive_sharpes = np.where(ann_std > 0, ann_mean / ann_std, np.nan)
+
+    # Filter out NaNs
+    naive_sharpes = naive_sharpes[~np.isnan(naive_sharpes)]
 
     p_value = float((naive_sharpes >= janus_sharpe).mean())
 

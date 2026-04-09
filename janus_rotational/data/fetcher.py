@@ -31,7 +31,7 @@ def fetch_price_volume(
     tickers: Sequence[str],
     start: str,
     end: str,
-    missing_data_threshold: float = 0.80,
+    missing_data_threshold: float = 0.0,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Download daily adjusted-close prices and volume for *tickers*.

@@ -57,9 +57,9 @@ def build_6040_benchmark(
     ACWI: iShares MSCI ACWI ETF  (launched 2008-01-08)
     BND:  Vanguard Total Bond ETF (launched 2007-04-10)
     """
-    logger.info("Fetching ACWI and BND for 60/40 benchmark [%s → %s]", start, end)
+    logger.info("Fetching ACWI, BND, AGG, SPY for 60/40 benchmark proxies [%s → %s]", start, end)
     raw = yf.download(
-        ["ACWI", "BND"],
+        ["ACWI", "BND", "AGG", "SPY"],
         start=start, end=end,
         auto_adjust=True,
         progress=False,
@@ -68,14 +68,31 @@ def build_6040_benchmark(
     prices_bm.columns = prices_bm.columns.get_level_values(-1) if hasattr(
         prices_bm.columns, "levels"
     ) else prices_bm.columns
-    prices_bm = prices_bm.ffill().dropna()
+    prices_bm = prices_bm.ffill()
 
-    rets = prices_bm.pct_change().dropna()
-    port_rets = 0.60 * rets["ACWI"] + 0.40 * rets["BND"]
+    # ── Handle missing BND (launch 2007) and ACWI (launch 2008) ────────
+    # BND fallback: Use AGG (iShares Core US Aggregate Bond - launch 2003)
+    if "BND" in prices_bm.columns:
+        if "AGG" in prices_bm.columns:
+            prices_bm["BND_proxy"] = prices_bm["BND"].combine_first(prices_bm["AGG"])
+        else:
+            prices_bm["BND_proxy"] = prices_bm["BND"]
+    else:
+        prices_bm["BND_proxy"] = prices_bm["AGG"]
+
+    # ACWI fallback: Use SPY (US Equity) for global proxy before 2008
+    if "ACWI" in prices_bm.columns:
+        prices_bm["ACWI_proxy"] = prices_bm["ACWI"].combine_first(prices_bm["SPY"])
+    else:
+        prices_bm["ACWI_proxy"] = prices_bm["SPY"]
+
+    # Calculate returns using proxies
+    rets = prices_bm[["ACWI_proxy", "BND_proxy"]].pct_change().dropna()
+    port_rets = 0.60 * rets["ACWI_proxy"] + 0.40 * rets["BND_proxy"]
 
     curve = initial_capital * (1.0 + port_rets).cumprod()
-    # Prepend the initial capital on the day before the first return
-    t0 = pd.Series([initial_capital], index=[prices_bm.index[0]], name=curve.name)
+    # Prepend initial capital on the first valid index day
+    t0 = pd.Series([initial_capital], index=[rets.index[0] - pd.Timedelta(days=1)], name=curve.name)
     curve = pd.concat([t0, curve])
     curve.name = "60/40 ACWI/BND"
     return curve
