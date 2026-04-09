@@ -78,6 +78,12 @@ def exp_cost():
         plt.plot(c.index, c.values / 1e6, label=c.name)
     plt.title("Cost Impact on Portfolio Growth (Log Scale)")
     plt.yscale('log')
+    # Granular Log-Scale Axis
+    import matplotlib.ticker as mtick
+    plt.gca().yaxis.set_major_locator(mtick.LogLocator(base=10, subs=[1.0, 2.0, 5.0]))
+    plt.gca().yaxis.set_major_formatter(mtick.ScalarFormatter())
+    plt.gca().get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, _: f"${x:.1f}M"))
+    
     plt.ylabel("Portfolio Value ($M)")
     plt.grid(True, alpha=0.3)
     plt.legend()
@@ -108,6 +114,8 @@ def exp_mom():
     
     ax1.set_ylabel('CAGR (%)', color='skyblue')
     ax2.set_ylabel('Sharpe Ratio', color='orange')
+    ax1.yaxis.set_major_locator(plt.MaxNLocator(nbins=6))
+    ax2.yaxis.set_major_locator(plt.MaxNLocator(nbins=6))
     plt.xticks(x, df['Window'])
     plt.title("Momentum Window Comparison")
     plt.grid(True, axis='y', alpha=0.3)
@@ -132,6 +140,12 @@ def exp_smoothing():
         plt.plot(c.index, c.values / 1e6, label=c.name)
     plt.title("Effect of Laddered Smoothing on Equity Curve")
     plt.yscale('log')
+    # Granular Log-Scale Axis
+    import matplotlib.ticker as mtick
+    plt.gca().yaxis.set_major_locator(mtick.LogLocator(base=10, subs=[1.0, 2.0, 5.0]))
+    plt.gca().yaxis.set_major_formatter(mtick.ScalarFormatter())
+    plt.gca().get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, _: f"${x:.1f}M"))
+    
     plt.ylabel("Portfolio Value ($M)")
     plt.grid(True, alpha=0.3)
     plt.legend()
@@ -155,6 +169,7 @@ def exp_lag():
     plt.title("Performance Sensitivity to Reporting Lag")
     plt.xlabel("Reporting Lag (Days)")
     plt.ylabel("CAGR (%)")
+    plt.gca().yaxis.set_major_locator(plt.MaxNLocator(nbins=8))
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(f"{PLOTS_DIR}research_4_fundamental_lag.png")
@@ -178,6 +193,12 @@ def exp_universe():
     plt.plot(c_tech.index, c_tech.values / 1e6, label="US Tech Concentration")
     plt.title("Alpha Comparison: Diversification vs Concentrated Tech")
     plt.yscale('log')
+    # Granular Log-Scale Axis
+    import matplotlib.ticker as mtick
+    plt.gca().yaxis.set_major_locator(mtick.LogLocator(base=10, subs=[1.0, 2.0, 5.0]))
+    plt.gca().yaxis.set_major_formatter(mtick.ScalarFormatter())
+    plt.gca().get_yaxis().set_major_formatter(mtick.FuncFormatter(lambda x, _: f"${x:.1f}M"))
+    
     plt.ylabel("Portfolio Value ($M)")
     plt.grid(True, alpha=0.3)
     plt.legend()

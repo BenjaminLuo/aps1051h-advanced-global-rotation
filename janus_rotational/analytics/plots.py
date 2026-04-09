@@ -118,8 +118,7 @@ def plot_regime_overlay(
     _regime_fill(ax, spy.index, regime)
 
     ax.plot(spy.index, spy, color=SPY_COLOR, linewidth=1.4, zorder=2, label="SPY (adj. close)")
-    ax.set_ylabel("Adjusted Close (USD)", **FONT_LABEL)
-    ax.set_xlabel("")
+    ax.yaxis.set_major_locator(plt.MaxNLocator(nbins=8, prune='both'))
     ax.tick_params(axis="both", **FONT_TICK)
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     ax.xaxis.set_major_locator(mdates.YearLocator())
@@ -197,6 +196,7 @@ def plot_capital_allocation(
 
     ax.set_ylim(0, 100)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    ax.yaxis.set_major_locator(mtick.MultipleLocator(20))
     ax.set_ylabel("% of Portfolio", **FONT_LABEL)
     ax.set_xlabel("")
     ax.tick_params(axis="both", **FONT_TICK)
@@ -273,10 +273,12 @@ def plot_equity_and_drawdown(
         )
 
     ax1.set_ylabel("Portfolio Value (log scale, USD)", **FONT_LABEL)
-    ax1.yaxis.set_major_formatter(mtick.FuncFormatter(
+    # Granular Log-Scale Axis
+    ax1.yaxis.set_major_locator(mtick.LogLocator(base=10, subs=[1.0, 2.0, 5.0]))
+    ax1.yaxis.set_major_formatter(mtick.ScalarFormatter())
+    ax1.get_yaxis().set_major_formatter(mtick.FuncFormatter(
         lambda x, _: f"${x/1e6:.1f}M" if x >= 1e6 else f"${x/1e3:.0f}K"
     ))
-    ax1.legend(loc="upper left", **FONT_LEGEND)
     ax1.tick_params(axis="both", **FONT_TICK)
     plt.setp(ax1.get_xticklabels(), visible=False)
 
