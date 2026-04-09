@@ -20,7 +20,7 @@ The system maintains a "Regime Flag" updated every Friday based on an **OR-Logic
     - **Altman Z-Score < 1.87** (Financial distress) OR **Piotroski F-Score < 4** (Operational rot).
     - **Constraint**: Strict 45-day reporting lag to prevent look-ahead bias.
 2.  **Technical Filter**: Broad market trend.
-    - **SPY Close < 200-day SMA**. Provides immediate reaction to rapid crashes (e.g., COVID 2020) before fundamentals reflect the damage.
+    - **SPY Close < 100-day SMA**. Provides immediate reaction to rapid crashes (e.g., COVID 2020). By reducing this from the standard 200-day window, the system achieves an "Elastic" switch that exits equities significantly earlier during momentum breakdowns.
 
 **Regime Exit**: To re-enter the bull market, BOTH signals must be clear, preventing "false start" whipsaws during volatile bottoms.
 

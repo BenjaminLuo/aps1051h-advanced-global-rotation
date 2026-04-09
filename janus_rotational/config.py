@@ -63,8 +63,8 @@ MOMENTUM_LONG_WINDOW:  int = 126    # ≈ 6 calendar months
 # Top-N selections per week (increased from 3 → 5 for diversification)
 TOP_N_SELECTIONS: int = 5
 
-# Technical crash filter: SPY below its 200-day SMA triggers crash regime
-SMA_CRASH_WINDOW: int = 200
+# Technical crash filter: SPY below its 100-day SMA triggers crash regime
+SMA_CRASH_WINDOW: int = 100
 
 # ── Reproducibility ───────────────────────────────────────────────────────────
 RANDOM_SEED: int = 42
