@@ -100,28 +100,40 @@ def build_weekly_regime(
     weekly["piotroski_trigger"] = weekly["piotroski_f"] < piotroski_threshold
     weekly["fundamental_crash"] = weekly["altman_trigger"] | weekly["piotroski_trigger"]
 
-    # ── Technical filter: SPY < 200-day SMA ──────────────────────────────
+    # ── Technical filter: SMA-200 + MACD Confirmation ───────────────────
     if prices is not None and "SPY" in prices.columns:
         spy_daily = prices.loc[start:end, "SPY"].dropna()
 
-        # Strict min_periods: no signal until the SMA is fully warmed up
+        # 1. Primary Trend (SMA)
         sma_daily = spy_daily.rolling(sma_window, min_periods=sma_window).mean()
+
+        # 2. Momentum Confirmation (MACD 12/26)
+        exp1 = spy_daily.ewm(span=12, adjust=False).mean()
+        exp2 = spy_daily.ewm(span=26, adjust=False).mean()
+        macd_daily = exp1 - exp2
+
+        # Confirmation Logic: Both Trend and Momentum must be bearish
+        # This prevents whipsaws during 'shallow' price breaks
         below_sma  = (spy_daily < sma_daily)
+        neg_macd   = (macd_daily < 0)
+        crash_bool = below_sma & neg_macd
 
         # Sample to Friday grid (forward-fill handles holiday Fridays)
         weekly["spy_price"]   = spy_daily.reindex(weekly.index, method="ffill")
         weekly["spy_sma_200"] = sma_daily.reindex(weekly.index, method="ffill").round(2)
+        weekly["spy_macd"]    = macd_daily.reindex(weekly.index, method="ffill").round(3)
         weekly["technical_crash"] = (
-            below_sma.reindex(weekly.index, method="ffill").fillna(False)
+            crash_bool.reindex(weekly.index, method="ffill").fillna(False)
         )
         logger.info(
-            "Technical filter active (SPY < %d-day SMA): %d crash Fridays",
+            "Technical filter active (Confirm: SMA-%d & MACD < 0): %d crash Fridays",
             sma_window,
             int(weekly["technical_crash"].sum()),
         )
     else:
         weekly["spy_price"]       = np.nan
         weekly["spy_sma_200"]     = np.nan
+        weekly["spy_macd"]        = np.nan
         weekly["technical_crash"] = False
         logger.info("Technical filter inactive (no prices supplied — v1 mode)")
 
@@ -139,6 +151,7 @@ def build_weekly_regime(
         "fundamental_crash",
         "spy_price",
         "spy_sma_200",
+        "spy_macd",
         "technical_crash",
         "crash_regime",
     ]]
