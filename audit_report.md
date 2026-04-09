@@ -9,17 +9,17 @@ This document provides a line-of-defense analysis of the Janus Rotational codeba
 | **fundamentals.py** | Peeking at earnings before they are published. | **Hard-coded 45-day lag**. Data is explicitly timestamped for future availability. | **VALIDATED** |
 | **macro.py** | Using future SPY prices for regime switching. | Uses trailing **rolling(200).mean()**. No access to future price indices. | **VALIDATED** |
 | **selector.py** | Ranking assets based on the day's performance. | Sampling happens on **Friday Close**. Momentum is purely lagging. | **VALIDATED** |
-| **ladder.py** | Executing Friday's signal at Friday's price. | **MOC Assumption**: Trades execute at Friday close with 2bps slippage. | **MITIGATED** |
+| **ladder.py** | Executing Friday's signal at Friday's price. | **1-Day Lag**: Rebalances execute on the next business day (Monday). | **VALIDATED** |
 | **fetcher.py** | Future data injection via `yfinance`. | Uses `auto_adjust=True` for total return; data is reindexed day-end. | **VALIDATED** |
 
 ---
 
 ## Technical Rigor: Points of Attention
 
-### 1. The "MOC" Execution Model
-**Finding**: The system assumes signals calculated from the Friday close are tradeable at that same Friday close.
-**Real-World Applicability**: This corresponds to an **MOC (Market on Close)** order entry. Modern electronic markets allow MOC orders to be entered in the final 5–10 minutes before the bell. 
-**Conservative Buffer**: We apply a **2 bps slippage** + **$0.005/share commission** to account for the bid-ask spread and execution costs inherent in MOC auctions.
+### 1. The Monday Execution Model (1-Day Lag)
+**Finding**: Calculated signals are generated at the Friday close and executed on the next business day (typically Monday).
+**Real-World Applicability**: This provides the highest level of out-of-sample integrity, as there is zero physical possibility of "peeking" at future prices during the signal generation weekend.
+**Conservative Buffer**: We maintain a **2 bps slippage** + **$0.005/share commission** on top of the 1-day lag.
 
 ### 2. Survivorship Bias Disclosure
 **Finding**: The `EQUITY_UNIVERSE` reflects the top ETFs as of 2024.

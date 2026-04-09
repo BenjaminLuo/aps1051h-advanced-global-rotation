@@ -100,6 +100,7 @@ if __name__ == "__main__":
 
     engine = LadderEngine(
         initial_capital = INITIAL_CAPITAL,
+        execution_lag   = 1,
         n_tranches      = 4,
         slippage        = 0.0002,
         commission      = 0.005,

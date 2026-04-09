@@ -62,6 +62,7 @@ def run_single_regime(name, start, end, title, prices, volume):
     
     engine = LadderEngine(
         initial_capital = INITIAL_CAPITAL,
+        execution_lag   = 1,
         asset_classes   = {
             "us_equity":     US_ETFS,
             "global_equity": GLOBAL_ETFS,

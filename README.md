@@ -9,8 +9,8 @@ The **Janus Rotational System** is a high-performance algorithmic trading engine
 
 ## 🚀 Key Features
 
+- **Strict 1-Day Execution Lag**: Signals are generated at the Friday Close, and trades are executed at the **Monday Close** (with slippage/commission). This eliminates any "Market-on-Close" peeking bias.
 - **Double-Filter Macro Regime Switch**: Combines fundamental health (Altman Z-Score & Piotroski F-Score) with technical trend-following (200-day SMA).
-- **Graceful Sparse-Universe Handling**: Specifically designed to handle the launch of new ETFs throughout 2005–2024, utilizing high-correlation proxies where necessary.
 - **Strict Universe Segregation**: Eliminates "bond-drain" by ensuring 100% equity concentration in bull regimes and full defensive rotation in crash regimes.
 - **Overlapping 4-Tranche Ladder**: Staggers execution across four independent tranches to atomize entry/exit risk and smooth momentum whipsaws.
 - **Statistical Validation**: Built-in **White's Reality Check** (bootstrap test) to ensure Alpha is statistically significant against random selection benchmarks.
@@ -64,9 +64,9 @@ Summary of strategy performance across the total 20-year dataset and partitioned
 
 | Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+7.64%** | **+14.32%** | +6.37% | +5.82% | +10.39% |
-| **Sharpe Ratio** | **0.393** | **0.729** | 0.363 | 0.324 | 0.507 |
-| **Max Drawdown** | **-51.65%** | **-19.29%** | -20.01% | -22.89% | -55.19% |
+| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
+| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
+| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
 
 *Detailed breakdowns and visual reports for each regime are available in the `/plots` subdirectories.*
 
@@ -115,9 +115,9 @@ The system is modularized into steps for transparency:
 
 | Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+7.64%** | **+14.32%** | +6.37% | +5.82% | +10.39% |
-| **Sharpe Ratio** | **0.393** | **0.729** | 0.363 | 0.324 | 0.507 |
-| **Max Drawdown** | **-51.65%** | **-19.29%** | -20.01% | -22.89% | -55.19% |
+| **CAGR** | **+7.42%** | **+13.05%** | +6.19% | +4.45% | +10.39% |
+| **Sharpe Ratio** | **0.390** | **0.663** | 0.349 | 0.232 | 0.507 |
+| **Max Drawdown** | **-52.91%** | **-20.40%** | -22.05% | -26.24% | -55.19% |
 
 ---
 
@@ -127,8 +127,7 @@ The system is modularized into steps for transparency:
 
 The system's performance is structurally different across market epochs:
 
-### 1. GFC & Recovery (2005–2010)
-**The primary alpha generator.** Navigated the 2008 crash with a **14.32% CAGR**.
+### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **13.05% CAGR**.
 ![Regime 1 Equity](plots/regime_1_GFC/figure_3_equity_drawdown.png)
 
 ### 2. The Long Bull (2011–2019)
@@ -152,9 +151,8 @@ To ensure the highest standard of backtesting integrity, the following instituti
 - **Reporting Resolution**: If a data release lands on a weekend, it is only made available to the system on the following Monday.
 
 ### 2. Execution & Market Impact
-- **MOC Assumption**: By default, rebalances execute at the Friday close price. This assumes **Market-on-Close (MOC)** order entry.
+- **Strict 1-Day Lag**: Rebalances execute at the next business day's close price (typically Monday). This provides **"Bulletproof" academic integrity** by ensuring signals are fully known before any trades are simulated.
 - **Transaction Costs**: Every trade incurs a **2 bps slippage** buffer and a **$0.005/share commission** to simulate bid-ask spread and broker fees.
-- **Execution Lag Toggle**: The `LadderEngine` supports an optional `execution_lag` parameter (e.g., set to `1` to simulate trading at Monday's open) for "Bulletproof" validation.
 
 ### 3. Survivorship Bias
 - **Disclaimer**: This backtest utilizes the **current (2024)** SPY Top-10 / sector ETF universe. ETFs that were active in 2005 but subsequently delisted are not included. This is a structural limitation of public data sources and may slightly overstate historical returns by 0.5%–1.0%.

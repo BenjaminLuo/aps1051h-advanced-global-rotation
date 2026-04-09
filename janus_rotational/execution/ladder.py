@@ -93,6 +93,10 @@ class LadderEngine:
 
     TRANCHE_LABELS = ["A", "B", "C", "D"]
 
+    def __init__(
+        self,
+        initial_capital:  float         = 1_000_000.0,
+        n_tranches:        int           = 4,
         slippage:          float         = DEFAULT_SLIPPAGE,
         commission:        float         = DEFAULT_COMMISSION,
         execution_lag:     int           = 0,
