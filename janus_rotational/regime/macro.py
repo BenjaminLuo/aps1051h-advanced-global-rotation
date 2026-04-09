@@ -50,6 +50,7 @@ def build_weekly_regime(
     piotroski_threshold: float = PIOTROSKI_CRASH_THRESHOLD,
     sma_window:          int   = SMA_CRASH_WINDOW,
     stress_severity:     str   = 'standard',
+    lag_days:            int   = 45,
 ) -> pd.DataFrame:
     """
     Build the weekly Friday macro-regime flag (Janus 2.0 double-filter).
@@ -80,7 +81,7 @@ def build_weekly_regime(
         spy_price, spy_sma_200, technical_crash,
         crash_regime  (= fundamental_crash OR technical_crash)
     """
-    daily = build_daily_fundamental_series(start=start, end=end, stress_severity=stress_severity)
+    daily = build_daily_fundamental_series(start=start, end=end, stress_severity=stress_severity, lag_days=lag_days)
 
     fridays_mask = daily.index.weekday == 4
     weekly = daily.loc[fridays_mask].copy()

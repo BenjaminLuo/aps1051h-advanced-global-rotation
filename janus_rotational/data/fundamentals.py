@@ -209,6 +209,7 @@ def build_daily_fundamental_series(
     end: str,
     tickers: list[str] | None = None,
     stress_severity: str = 'standard',
+    lag_days: int = REPORTING_LAG_DAYS,
 ) -> pd.DataFrame:
     """
     Build a **daily** time-series of the most-recently-available
@@ -250,7 +251,7 @@ def build_daily_fundamental_series(
     )
     per_ticker = _mock_quarterly_scores(tickers, quarters, stress_severity=stress_severity)
     agg        = _aggregate_to_index_level(per_ticker)
-    lagged     = _apply_reporting_lag(agg)
+    lagged     = _apply_reporting_lag(agg, lag_days=lag_days)
 
     # ── Snap availability dates to next business day ───────────────────────
     # If the 45th day is Saturday Nov-14, data appears on Monday Nov-16.

@@ -91,8 +91,6 @@ class LadderEngine:
         Commission per share in USD.  Default $0.005.
     """
 
-    TRANCHE_LABELS = ["A", "B", "C", "D"]
-
     def __init__(
         self,
         initial_capital:  float         = 1_000_000.0,
@@ -107,7 +105,7 @@ class LadderEngine:
         self.slippage        = slippage
         self.commission      = commission
         self.execution_lag   = execution_lag
-        self.labels          = self.TRANCHE_LABELS[:n_tranches]
+        self.labels          = [f"T{i+1}" for i in range(n_tranches)]
         # Track arbitrary asset categories (e.g., US Equities, Bonds, etc.)
         self._asset_classes = {
             name: set(tickers) for name, tickers in (asset_classes or {}).items()
