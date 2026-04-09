@@ -218,11 +218,11 @@ if __name__ == "__main__":
     plot_regime_overlay(prices=prices, regime=regime, start=OOS_START, end=OOS_END)
 
     # ── Figure 2: Capital Allocation ──────────────────────────────────────
-    if "equity_value" in daily.columns and "bond_value" in daily.columns:
-        print("  Figure 2: Dynamic capital allocation stacked area …")
+    if "us_equity_value" in daily.columns or "equity_value" in daily.columns:
+        print("  Figure 2: Granular capital allocation stacked area …")
         plot_capital_allocation(daily=daily, regime=regime)
     else:
-        print("  Figure 2: SKIPPED — equity/bond columns not in daily_df")
+        print("  Figure 2: SKIPPED — tracking columns not in daily_df")
 
     # ── Figure 3: Equity Curves + Drawdown ───────────────────────────────
     print("  Figure 3: Cumulative equity curves + drawdown …")
