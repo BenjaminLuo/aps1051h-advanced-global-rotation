@@ -94,13 +94,20 @@ if __name__ == "__main__":
     # ── Run Janus ladder (with equity/bond split tracking) ─────────────────
     section("RUNNING LADDER with equity/bond allocation tracking")
 
+    # Categorize for granular Figure 2 reporting
+    US_ETFS     = ["SPY", "QQQ", "DIA", "IWM", "MDY", "XLB", "XLE", "XLF", "XLI", "XLK", "XLV"]
+    GLOBAL_ETFS = ["EWC", "EFA", "EZU", "EWJ", "EWU", "EWG", "EWA", "EEM", "EWZ"]
+
     engine = LadderEngine(
         initial_capital = INITIAL_CAPITAL,
         n_tranches      = 4,
         slippage        = 0.0002,
         commission      = 0.005,
-        equity_tickers  = EQUITY_UNIVERSE,
-        bond_tickers    = BOND_UNIVERSE,
+        asset_classes   = {
+            "us_equity":     US_ETFS,
+            "global_equity": GLOBAL_ETFS,
+            "bond":          BOND_UNIVERSE,
+        }
     )
     result = engine.run(
         prices=prices, selections=selections,

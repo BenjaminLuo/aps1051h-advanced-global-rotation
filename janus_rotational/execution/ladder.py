@@ -99,17 +99,17 @@ class LadderEngine:
         n_tranches:        int           = 4,
         slippage:          float         = DEFAULT_SLIPPAGE,
         commission:        float         = DEFAULT_COMMISSION,
-        equity_tickers:    list[str] | None = None,
-        bond_tickers:      list[str] | None = None,
+        asset_classes:     dict[str, list[str]] | None = None,
     ) -> None:
         self.initial_capital = initial_capital
         self.n_tranches      = n_tranches
         self.slippage        = slippage
         self.commission      = commission
         self.labels          = self.TRANCHE_LABELS[:n_tranches]
-        # Optional: track equity/bond split in daily snapshot (for Figure 2)
-        self._eq_set   = set(equity_tickers) if equity_tickers else set()
-        self._bond_set = set(bond_tickers)   if bond_tickers   else set()
+        # Track arbitrary asset categories (e.g., US Equities, Bonds, etc.)
+        self._asset_classes = {
+            name: set(tickers) for name, tickers in (asset_classes or {}).items()
+        }
 
     # ── Public API ────────────────────────────────────────────────────────
 
@@ -272,22 +272,15 @@ class LadderEngine:
             row[f"T{lbl}_value"] = round(tv, 2)
             row[f"T{lbl}_cash"]  = round(t.cash, 2)
 
-        # Optional equity/bond allocation split (populated when universe sets provided)
-        if self._eq_set or self._bond_set:
-            eq_val = sum(
+        # Optional: granular asset class allocation tracking
+        for name, tkr_set in self._asset_classes.items():
+            cat_val = sum(
                 n * close_row.get(tkr, 0.0)
                 for t in tranches.values()
                 for tkr, n in t.holdings.items()
-                if tkr in self._eq_set
+                if tkr in tkr_set
             )
-            bond_val = sum(
-                n * close_row.get(tkr, 0.0)
-                for t in tranches.values()
-                for tkr, n in t.holdings.items()
-                if tkr in self._bond_set
-            )
-            row["equity_value"] = round(eq_val, 2)
-            row["bond_value"]   = round(bond_val, 2)
+            row[f"{name}_value"] = round(cat_val, 2)
 
         return row
 

@@ -40,9 +40,10 @@ JANUS_COLOR  = "#1B263B"     # dark navy
 SPY_COLOR    = "#E63946"     # vivid red
 BENCH_COLOR  = "#457B9D"     # steel blue
 CRASH_COLOR  = "#E63946"     # same red, lower alpha
-EQUITY_COLOR = "#2196F3"     # material blue
-BOND_COLOR   = "#FF6F00"     # deep amber
-CASH_COLOR   = "#BDBDBD"     # light grey
+US_EQ_COLOR  = "#1976D2"     # deep blue
+INT_EQ_COLOR = "#388E3C"     # forest green
+BOND_COLOR   = "#F57C00"     # dark orange
+CASH_COLOR   = "#CFD8DC"     # blue-grey light
 
 FONT_TITLE  = {"fontsize": 13, "fontweight": "bold"}
 FONT_LABEL  = {"fontsize": 11}
@@ -151,27 +152,32 @@ def plot_capital_allocation(
     save:   bool = True,
 ) -> plt.Figure:
     """
-    100% stacked area chart of equity vs bond vs cash allocation over time.
-    Requires 'equity_value' and 'bond_value' columns in *daily* (from
-    LadderEngine with equity_tickers / bond_tickers supplied).
+    100% stacked area chart of equity (US vs Int) vs bond vs cash allocation.
     """
-    pv   = daily["portfolio_value"].replace(0, np.nan)
-    eq_pct   = (daily["equity_value"] / pv * 100).fillna(0)
-    bond_pct = (daily["bond_value"]   / pv * 100).fillna(0)
-    cash_pct = (100 - eq_pct - bond_pct).clip(lower=0)
+    pv = daily["portfolio_value"].replace(0, np.nan)
+
+    # Detect available granular columns
+    us_val = daily["us_equity_value"] if "us_equity_value" in daily.columns else daily.get("equity_value", 0)
+    gl_val = daily["global_equity_value"] if "global_equity_value" in daily.columns else 0
+    bn_val = daily["bond_value"] if "bond_value" in daily.columns else 0
+
+    us_pct   = (us_val / pv * 100).fillna(0)
+    gl_pct   = (gl_val / pv * 100).fillna(0)
+    bond_pct = (bn_val / pv * 100).fillna(0)
+    cash_pct = (100 - us_pct - gl_pct - bond_pct).clip(lower=0)
 
     fig, ax = plt.subplots(figsize=(14, 5))
     fig.suptitle(
-        "Figure 2 — Dynamic Capital Allocation: Equities vs Bonds (2015–2024)",
+        "Figure 2 — Granular Capital Allocation: US vs Global vs Bonds (2015–2024)",
         **FONT_TITLE, y=1.01,
     )
 
     ax.stackplot(
         daily.index,
-        eq_pct, bond_pct, cash_pct,
-        labels=["Equities", "Bonds / Safe Haven", "Cash (rounding residual)"],
-        colors=[EQUITY_COLOR, BOND_COLOR, CASH_COLOR],
-        alpha=0.88,
+        us_pct, gl_pct, bond_pct, cash_pct,
+        labels=["US Equities", "Global Equities", "Bonds / Safe Haven", "Cash residual"],
+        colors=[US_EQ_COLOR, INT_EQ_COLOR, BOND_COLOR, CASH_COLOR],
+        alpha=0.85,
         zorder=2,
     )
 
@@ -179,7 +185,7 @@ def plot_capital_allocation(
     is_crash = regime["crash_regime"].reindex(daily.index, method="ffill").fillna(False)
     transitions = is_crash.astype(int).diff().fillna(0)
     for dt in transitions[transitions != 0].index:
-        ax.axvline(dt, color="grey", linewidth=0.6, alpha=0.5, zorder=3)
+        ax.axvline(dt, color="#333333", linestyle=":", linewidth=0.8, alpha=0.4, zorder=3)
 
     ax.set_ylim(0, 100)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter())
@@ -188,17 +194,7 @@ def plot_capital_allocation(
     ax.tick_params(axis="both", **FONT_TICK)
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     ax.xaxis.set_major_locator(mdates.YearLocator())
-    ax.legend(loc="lower left", **FONT_LEGEND)
-
-    # Annotate the 4-week staggered crash entry
-    ax.annotate(
-        "4-week staggered\ntransition into bonds",
-        xy=(pd.Timestamp("2020-06-01"), 50),
-        xytext=(pd.Timestamp("2018-06-01"), 75),
-        arrowprops=dict(arrowstyle="->", color="black", lw=1.0),
-        fontsize=8.5, ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="grey", alpha=0.8),
-    )
+    ax.legend(loc="lower left", **FONT_LEGEND, frameon=True, framealpha=0.9)
 
     fig.tight_layout()
     if save:
