@@ -120,33 +120,58 @@ The system is modularized into steps for transparency:
 
 ## 🏛 Market Regime Insights
 
-The system's performance is structurally different across market epochs:
+The system's performance is structurally different across market epochs. Click each regime below to view the detailed academic report (Figures 5–16).
 
-### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **9.83% CAGR**.
-- **Figure 5**: SPY Price & Macro Regime (GFC)
-- **Figure 6**: Capital Allocation (GFC)
-- **Figure 7**: Equity Curves & Drawdown (GFC)
-- **Figure 8**: White's Reality Check (GFC)
+### 1. **GFC & Recovery (2005–2010)**
+The primary alpha generator. Effectively navigated the 2008 crash with a **9.83% CAGR**.
 
-![Regime 1 Equity](plots/regime_1_GFC/figure_7_equity_drawdown.png)
+<details>
+<summary><b>View GFC Visual Report (Figures 5–8)</b></summary>
 
-### 2. The Long Bull (2011–2019)
+- **Figure 5**: SPY Price & Macro Regime switch points during the GFC.
+![GFC Overlay](plots/regime_1_GFC/figure_5_regime_overlay.png)
+- **Figure 6**: Capital Allocation during the 2008 transition.
+![GFC Allocation](plots/regime_1_GFC/figure_6_capital_allocation.png)
+- **Figure 7**: Cumulative Equity Curves & Drawdown (GFC focus).
+![GFC Equity](plots/regime_1_GFC/figure_7_equity_drawdown.png)
+- **Figure 8**: White's Reality Check for the GFC epoch.
+![GFC Whites](plots/regime_1_GFC/figure_8_whites_reality_check.png)
+
+</details>
+
+### 2. **The Long Bull (2011–2019)**
 **Steady momentum with defensive discipline.** Tracked the market standard CAGR while minimizing extreme tail-risk.
-- **Figure 9**: SPY Price & Macro Regime (Bull)
-- **Figure 10**: Capital Allocation (Bull)
-- **Figure 11**: Equity Curves & Drawdown (Bull)
-- **Figure 12**: White's Reality Check (Bull)
 
-![Regime 2 Equity](plots/regime_2_Bull/figure_11_equity_drawdown.png)
+<details>
+<summary><b>View Bull Market Visual Report (Figures 9–12)</b></summary>
 
-### 3. Modern Vol (2020–2024)
+- **Figure 9**: SPY Price & Macro Regime (Bull era).
+![Bull Overlay](plots/regime_2_Bull/figure_9_regime_overlay.png)
+- **Figure 10**: Capital Allocation (Bull era).
+![Bull Allocation](plots/regime_2_Bull/figure_10_capital_allocation.png)
+- **Figure 11**: Equity Curves & Drawdown (Bull era).
+![Bull Equity](plots/regime_2_Bull/figure_11_equity_drawdown.png)
+- **Figure 12**: White's Reality Check (Bull era).
+![Bull Whites](plots/regime_2_Bull/figure_12_whites_reality_check.png)
+
+</details>
+
+### 3. **Modern Vol (2020–2024)**
 **Transition to the high-vol era.** Robust capital preservation through the COVID-19 shock and the 2022 rate-hike bear market.
-- **Figure 13**: SPY Price & Macro Regime (Modern)
-- **Figure 14**: Capital Allocation (Modern)
-- **Figure 15**: Equity Curves & Drawdown (Modern)
-- **Figure 16**: White's Reality Check (Modern)
 
-![Regime 3 Equity](plots/regime_3_Modern/figure_15_equity_drawdown.png)
+<details>
+<summary><b>View Modern Vol Visual Report (Figures 13–16)</b></summary>
+
+- **Figure 13**: SPY Price & Macro Regime (Modern era).
+![Modern Overlay](plots/regime_3_Modern/figure_13_regime_overlay.png)
+- **Figure 14**: Capital Allocation (Modern era).
+![Modern Allocation](plots/regime_3_Modern/figure_14_capital_allocation.png)
+- **Figure 15**: Equity Curves & Drawdown (Modern era).
+![Modern Equity](plots/regime_3_Modern/figure_15_equity_drawdown.png)
+- **Figure 16**: White's Reality Check (Modern era).
+![Modern Whites](plots/regime_3_Modern/figure_16_whites_reality_check.png)
+
+</details>
 
 **Key Takeaway**: The Janus System is a **crisis-alpha** generator, designed to outperform precisely when passive portfolios are most vulnerable.
 
