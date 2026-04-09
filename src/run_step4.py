@@ -15,9 +15,13 @@ Run:
 
 from __future__ import annotations
 
-import logging
 import sys
+import os
+import logging
 import warnings
+
+# Ensure package can be found in src/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
 import numpy as np
 import pandas as pd

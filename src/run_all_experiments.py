@@ -1,9 +1,12 @@
+import sys
+import os
+# Ensure package can be found in src/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
 import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from janus_rotational.config import (
     BOND_UNIVERSE, DATA_END, DATA_START, EQUITY_UNIVERSE,
 )

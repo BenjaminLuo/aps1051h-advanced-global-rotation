@@ -8,11 +8,16 @@ Usage:
 """
 
 import logging
+import sys
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from pathlib import Path
+
+# Ensure package can be found in src/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 
 from janus_rotational.config import (
     DATA_START, DATA_END, EQUITY_UNIVERSE, BOND_UNIVERSE, RANDOM_SEED

@@ -91,29 +91,29 @@ The system is modularized into steps for transparency:
 
 - **Step 1: Data Acquisition**: Fetches total-return adjusted price and volume data.
   ```bash
-  python run_step1.py
+  python3 src/run_step1.py
   ```
 - **Step 2: Selection Audit**: Generates the weekly top-asset selections.
   ```bash
-  python run_step2.py
+  python3 src/run_step2.py
   ```
 - **Step 3: Execution Simulation**: Runs the laddered engine simulation.
   ```bash
-  python run_step3.py
+  python3 src/run_step3.py
   ```
 - **Step 4: Benchmarking & Validation**: Final validation, White's Reality Check, and Plot generation.
   ```bash
-  python run_step4.py
+  python3 src/run_step4.py
   ```
 
 - **Extra: GFC Stress Experiment**: Compare crisis-severity scenarios.
   ```bash
-  python run_experiment.py
+  python3 src/run_all_experiments.py
   ```
 
 - **Extra: Regime Partitioning**: Run the automated epoch-based analysis.
   ```bash
-  python run_regimes.py
+  python3 src/run_regimes.py
   ```
 
 ---

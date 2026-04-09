@@ -14,6 +14,11 @@ inspection of look-ahead-bias prevention.
 
 from __future__ import annotations
 
+import sys
+import os
+# Ensure package can be found in src/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
+
 import logging
 import sys
 import warnings
