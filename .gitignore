@@ -1,6 +1,9 @@
+# System & Metadata
 .claude/
+.gemini/
 *.jsonl
 __pycache__/
+*.pyc
 
 # Environments
 .venv/
@@ -16,4 +19,20 @@ Thumbs.db
 logs/
 data/raw/
 
-LICENSE
+# LaTeX Auxiliary Files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.bcf
+*.run.xml
+
+# Analytics & Temp
+plots/research/*.json
+**/temp_*.py
