@@ -254,12 +254,18 @@ class LadderEngine:
 
     @staticmethod
     def _tickers(sel_row: pd.Series) -> list[str]:
-        """Extract non-null rank_1/2/3 tickers from a selection row."""
-        return [
-            sel_row[f"rank_{i}"]
-            for i in range(1, 4)
-            if pd.notna(sel_row.get(f"rank_{i}"))
-        ]
+        """Extract all non-null rank_i tickers from a selection row."""
+        tickers = []
+        i = 1
+        while True:
+            col = f"rank_{i}"
+            if col not in sel_row.index:
+                break
+            tkr = sel_row[col]
+            if pd.notna(tkr):
+                tickers.append(tkr)
+            i += 1
+        return tickers
 
     def _daily_row(
         self,

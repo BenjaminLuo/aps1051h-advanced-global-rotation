@@ -68,10 +68,10 @@ Summary of strategy performance across the total 20-year dataset and partitioned
 
 | Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) | 60/40 (Full) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+8.43%** | **+14.39%** | +6.29% | +3.70% | +10.39% | +7.39% |
-| **Sharpe Ratio** | **0.444** | **0.781** | 0.354 | 0.198 | 0.507 | 0.505 |
-| **Max Drawdown** | **-34.12%** | **-15.54%** | -22.05% | -26.24% | -55.19% | -31.11% |
-| **White's RC (p)** | **0.340** | **0.052** | 0.612 | 0.620 | -- | -- |
+| **CAGR** | **+6.53%** | **+9.83%** | +6.98% | +2.75% | +10.34% | +7.39% |
+| **Sharpe Ratio** | **0.342** | **0.530** | 0.409 | 0.122 | 0.507 | 0.485 |
+| **Max Drawdown** | **-51.94%** | **-20.71%** | -23.14% | -27.06% | -55.19% | -35.97% |
+| **White's RC (p)** | **0.672** | **0.256** | 0.534 | 0.816 | -- | -- |
 
 *Detailed breakdowns and visual reports for each regime are available in the `/plots` subdirectories.*
 
@@ -118,22 +118,11 @@ The system is modularized into steps for transparency:
 
 ---
 
-| Metric | Janus System (Full) | GFC (05-10) | Bull (11-19) | Modern (20-24) | SPY (Full) | 60/40 (Full) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CAGR** | **+8.43%** | **+14.39%** | +6.29% | +3.70% | +10.39% | +7.39% |
-| **Sharpe Ratio** | **0.444** | **0.781** | 0.354 | 0.198 | 0.507 | 0.505 |
-| **Max Drawdown** | **-34.12%** | **-15.54%** | -22.05% | -26.24% | -55.19% | -31.11% |
-| **White's RC (p)** | **0.340** | **0.052** | 0.612 | 0.620 | -- | -- |
-
----
-
----
-
 ## 🏛 Market Regime Insights
 
 The system's performance is structurally different across market epochs:
 
-### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **14.39% CAGR**.
+### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **9.83% CAGR**.
 - **Figure 5**: SPY Price & Macro Regime (GFC)
 - **Figure 6**: Capital Allocation (GFC)
 - **Figure 7**: Equity Curves & Drawdown (GFC)
