@@ -93,7 +93,7 @@ def exp_cost():
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{PLOTS_DIR}research_1_cost_sensitivity.png")
+    plt.savefig(PLOTS_DIR / "research_1_cost_sensitivity.png")
     plt.close()
     return results
 
@@ -125,7 +125,7 @@ def exp_mom():
     plt.title("Momentum Window Comparison")
     plt.grid(True, axis='y', alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f"{PLOTS_DIR}research_2_momentum_windows.png")
+    plt.savefig(PLOTS_DIR / "research_2_momentum_windows.png")
     plt.close()
     return results
 
@@ -155,7 +155,7 @@ def exp_smoothing():
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{PLOTS_DIR}research_3_tranche_smoothing.png")
+    plt.savefig(PLOTS_DIR / "research_3_tranche_smoothing.png")
     plt.close()
     return results
 
@@ -177,7 +177,7 @@ def exp_lag():
     plt.gca().yaxis.set_major_locator(plt.MaxNLocator(nbins=8))
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f"{PLOTS_DIR}research_4_fundamental_lag.png")
+    plt.savefig(PLOTS_DIR / "research_4_fundamental_lag.png")
     plt.close()
     return results
 
@@ -208,7 +208,7 @@ def exp_universe():
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{PLOTS_DIR}research_5_universe_comparison.png")
+    plt.savefig(PLOTS_DIR / "research_5_universe_comparison.png")
     plt.close()
     return results
 
