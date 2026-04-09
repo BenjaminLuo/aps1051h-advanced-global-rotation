@@ -1,3 +1,17 @@
 .claude/
 *.jsonl
 __pycache__/
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Project-specific
+logs/
+data/raw/
