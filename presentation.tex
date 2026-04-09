@@ -78,7 +78,7 @@
 
 \begin{frame}{Visualizing the Regime (Figure 1)}
     \begin{center}
-        \includegraphics[height=0.65\textheight]{plots/figure_1_regime_overlay.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/figure_1_regime_overlay.png}
     \end{center}
     \footnotesize Red shading denotes the "Bear State" (Crash Regime). Note detection during the 2008 GFC, 2020 COVID shock, and 2022 rate cycle.
 \end{frame}
@@ -121,7 +121,7 @@
 
 \begin{frame}{Dynamic Capital Allocation (Figure 2)}
     \begin{center}
-        \includegraphics[height=0.65\textheight]{plots/figure_2_capital_allocation.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/figure_2_capital_allocation.png}
     \end{center}
     \footnotesize Illustrates the 4-week smoothed transition between Equities and Bonds during regime shifts.
 \end{frame}
@@ -145,7 +145,7 @@
 
 \begin{frame}{Full Horizon Comparison (Figure 3)}
     \begin{center}
-        \includegraphics[height=0.65\textheight]{plots/figure_3_equity_drawdown.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/figure_3_equity_drawdown.png}
     \end{center}
     \footnotesize Janus demonstrates recovery speed and drawdown resilience compared to the 60/40 benchmark.
 \end{frame}
@@ -153,6 +153,7 @@
 \begin{frame}{Performance Dashboard}
     \begin{table}
         \centering
+        \resizebox{\textwidth}{!}{%
         \begin{tabular}{lccc}
             \toprule
             \textbf{Metric} & \textbf{Janus System} & \textbf{SPY (Buy\&Hold)} & \textbf{60/40 Bench} \\
@@ -162,7 +163,7 @@
             \textbf{Sharpe Ratio} & 0.376 & 0.495 & 0.485 \\
             \textbf{Calmar Ratio} & 0.24 & 0.18 & 0.20 \\
             \bottomrule
-        \end{tabular}
+        \end{tabular}}
     \end{table}
     \vspace{0.3cm}
     \footnotesize Note: Janus prioritizes \textbf{Crisis Alpha} and capital preservation via systematic hedging.
@@ -170,7 +171,7 @@
 
 \begin{frame}{Statistical Verification (Figure 4)}
     \begin{center}
-        \includegraphics[height=0.65\textheight]{plots/figure_4_whites_reality_check.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/figure_4_whites_reality_check.png}
     \end{center}
     \footnotesize \textbf{White's Reality Check}: Validates the strategy against 500 "Naive" momentum permutations. p-value $< 0.05$ confirms structural skill over luck.
 \end{frame}
@@ -180,21 +181,21 @@
 
 \begin{frame}{Regime 1: The Great Financial Crisis (2007--2009)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/regime_1_GFC/figure_7_equity_drawdown.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/regime_1_GFC/figure_7_equity_drawdown.png}
     \end{center}
     \footnotesize Janus outperformed by \textbf{+6.74\% CAGR} over 60/40 during the crash, achieving a Sharpe of 0.53.
 \end{frame}
 
 \begin{frame}{Regime 2: The Secular Bull Run (2010--2019)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/regime_2_Bull/figure_11_equity_drawdown.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/regime_2_Bull/figure_11_equity_drawdown.png}
     \end{center}
     \footnotesize Note the performance drag vs SPY concentration. Janus "Active Drag" was ~2.5\% due to global diversification mandates.
 \end{frame}
 
 \begin{frame}{Regime 3: Modern Volatility (2020--2024)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/regime_3_Modern/figure_15_equity_drawdown.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/regime_3_Modern/figure_15_equity_drawdown.png}
     \end{center}
     \footnotesize Successful rotation during the 2022 Rate Shock; Janus limited drawdown to -27\% vs global index -25\%.
 \end{frame}
@@ -213,35 +214,35 @@
 
 \begin{frame}{Exp 1: Cost Breakeven (Figure R1)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/research/research_1_cost_sensitivity.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/research/research_1_cost_sensitivity.png}
     \end{center}
     \footnotesize The strategy remains viable up to \textbf{10 bps} slippage; decays to near-zero alpha at 20 bps.
 \end{frame}
 
 \begin{frame}{Exp 2: Momentum Sensitivity (Figure R2)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/research/research_2_momentum_windows.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/research/research_2_momentum_windows.png}
     \end{center}
     \footnotesize \textbf{"Slow"} momentum (6/12mo) identifies structural trends better than fast noise in the global ETF universe.
 \end{frame}
 
 \begin{frame}{Exp 3: Tranche Alpha (Figure R3)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/research/research_3_tranche_smoothing.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/research/research_3_tranche_smoothing.png}
     \end{center}
     \footnotesize Increasing Resolution: 1 tranche (+5.1\%) $\rightarrow$ 12 tranches \textbf{(+7.4\%)}. Timing risk reduction is a major alpha driver.
 \end{frame}
 
 \begin{frame}{Exp 4: Reporting Lag Stress (Figure R4)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/research/research_4_fundamental_lag.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/research/research_4_fundamental_lag.png}
     \end{center}
     \footnotesize High resiliency: Robust performance even with a **90-day** delay in fundamental releases.
 \end{frame}
 
 \begin{frame}{Exp 5: Universe Utility (Figure R5)}
     \begin{center}
-        \includegraphics[height=0.60\textheight]{plots/research/research_5_universe_comparison.png}
+        \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{plots/research/research_5_universe_comparison.png}
     \end{center}
     \footnotesize US Tech concentration offers hyper-growth (+13.3\%) but increases tail-risk (-42\% DD). Diversification is the "principled" choice.
 \end{frame}
