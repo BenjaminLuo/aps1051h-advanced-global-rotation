@@ -99,13 +99,23 @@ def run_single_regime(name, start, end, title, prices, volume):
     
     # 7. Plots
     logger.info("  Generating figures...")
-    plot_regime_overlay(prices, regime, start, end, output_dir=out_dir, title_suffix=title)
-    plot_capital_allocation(result.daily, regime, output_dir=out_dir, title_suffix=title)
+    start_fig = 5 + (REGIMES.index(next(r for r in REGIMES if r["name"] == name)) * 4)
+    
+    plot_regime_overlay(
+        prices, regime, start, end, 
+        output_dir=out_dir, title_suffix=title, fig_num=start_fig
+    )
+    plot_capital_allocation(
+        result.daily, regime, 
+        output_dir=out_dir, title_suffix=title, fig_num=start_fig+1
+    )
     plot_equity_and_drawdown(
         result.daily["portfolio_value"], spy_aligned, b6040_aligned, 
-        regime, metrics_sum, output_dir=out_dir, title_suffix=title
+        regime, metrics_sum, output_dir=out_dir, title_suffix=title, fig_num=start_fig+2
     )
-    plot_whites_test(whites, output_dir=out_dir, title_suffix=title)
+    plot_whites_test(
+        whites, output_dir=out_dir, title_suffix=title, fig_num=start_fig+3
+    )
     
     return {
         "regime": name,

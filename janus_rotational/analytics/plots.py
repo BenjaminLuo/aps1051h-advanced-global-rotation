@@ -102,6 +102,7 @@ def plot_regime_overlay(
     save:    bool = True,
     output_dir: Path | None = None,
     title_suffix: str = "",
+    fig_num: int = 1,
 ) -> plt.Figure:
     """
     SPY total-return price chart with crash-regime red shading.
@@ -110,7 +111,7 @@ def plot_regime_overlay(
 
     fig, ax = plt.subplots(figsize=(14, 5))
     fig.suptitle(
-        f"Figure 1 — SPY Price & Macro Regime Switch {title_suffix}",
+        f"Figure {fig_num} — SPY Price & Macro Regime Switch {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -140,7 +141,7 @@ def plot_regime_overlay(
     if save:
         base_dir = output_dir if output_dir else PLOT_DIR
         base_dir.mkdir(exist_ok=True, parents=True)
-        path = base_dir / "figure_1_regime_overlay.png"
+        path = base_dir / f"figure_{fig_num}_regime_overlay.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -156,6 +157,7 @@ def plot_capital_allocation(
     save:   bool = True,
     output_dir: Path | None = None,
     title_suffix: str = "",
+    fig_num: int = 2,
 ) -> plt.Figure:
     """
     100% stacked area chart of equity (US vs Int) vs bond vs cash allocation.
@@ -174,7 +176,7 @@ def plot_capital_allocation(
 
     fig, ax = plt.subplots(figsize=(14, 5))
     fig.suptitle(
-        f"Figure 2 — Granular Capital Allocation {title_suffix}",
+        f"Figure {fig_num} — Granular Capital Allocation {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -206,7 +208,7 @@ def plot_capital_allocation(
     if save:
         base_dir = output_dir if output_dir else PLOT_DIR
         base_dir.mkdir(exist_ok=True, parents=True)
-        path = base_dir / "figure_2_capital_allocation.png"
+        path = base_dir / f"figure_{fig_num}_capital_allocation.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -225,6 +227,7 @@ def plot_equity_and_drawdown(
     save:         bool = True,
     output_dir:   Path | None = None,
     title_suffix: str = "",
+    fig_num:      int = 3,
 ) -> plt.Figure:
     """
     Top panel: log-scale equity curves (Janus vs SPY vs 60/40).
@@ -236,7 +239,7 @@ def plot_equity_and_drawdown(
     ax2 = fig.add_subplot(gs[1], sharex=ax1)
 
     fig.suptitle(
-        f"Figure 3 — Equity Curves & Underwater Drawdown {title_suffix}",
+        f"Figure {fig_num} — Equity Curves & Underwater Drawdown {title_suffix}",
         **FONT_TITLE,
     )
 
@@ -301,7 +304,7 @@ def plot_equity_and_drawdown(
     if save:
         base_dir = output_dir if output_dir else PLOT_DIR
         base_dir.mkdir(exist_ok=True, parents=True)
-        path = base_dir / "figure_3_equity_drawdown.png"
+        path = base_dir / f"figure_{fig_num}_equity_drawdown.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig
@@ -316,6 +319,7 @@ def plot_whites_test(
     save:          bool = True,
     output_dir:    Path | None = None,
     title_suffix:  str = "",
+    fig_num:       int = 4,
 ) -> plt.Figure:
     """
     Histogram of naive Sharpe Ratios with the Janus Sharpe marked.
@@ -327,7 +331,7 @@ def plot_whites_test(
 
     fig, ax = plt.subplots(figsize=(10, 6))
     fig.suptitle(
-        f"Figure 4 — White's Reality Check {title_suffix}",
+        f"Figure {fig_num} — White's Reality Check {title_suffix}",
         **FONT_TITLE, y=1.01,
     )
 
@@ -385,7 +389,7 @@ def plot_whites_test(
     if save:
         base_dir = output_dir if output_dir else PLOT_DIR
         base_dir.mkdir(exist_ok=True, parents=True)
-        path = base_dir / "figure_4_whites_reality_check.png"
+        path = base_dir / f"figure_{fig_num}_whites_reality_check.png"
         fig.savefig(path, bbox_inches="tight")
         print(f"  Saved → {path}")
     return fig

@@ -42,6 +42,10 @@ Demonstrates the dynamic split between US Equities, Global Equities, and Bonds. 
 Cumulative performance comparison on a log scale (Janus vs. SPY vs. 60/40) over two decades of market shifts.
 ![Equity Curve](plots/figure_3_equity_drawdown.png)
 
+### Figure 4: White's Reality Check
+Statistical validation of the Janus Sharpe ratio against a bootstrap of 500 random-selection strategies.
+![White's Reality Check](plots/figure_4_whites_reality_check.png)
+
 ---
 
 ## 🧪 Historical Stress & Crisis Research
@@ -130,15 +134,30 @@ The system is modularized into steps for transparency:
 The system's performance is structurally different across market epochs:
 
 ### 1. **GFC & Recovery (2005–2010)**: The primary alpha generator. Effectively navigated the 2008 crash with a **14.39% CAGR**.
-![Regime 1 Equity](plots/regime_1_GFC/figure_3_equity_drawdown.png)
+- **Figure 5**: SPY Price & Macro Regime (GFC)
+- **Figure 6**: Capital Allocation (GFC)
+- **Figure 7**: Equity Curves & Drawdown (GFC)
+- **Figure 8**: White's Reality Check (GFC)
+
+![Regime 1 Equity](plots/regime_1_GFC/figure_7_equity_drawdown.png)
 
 ### 2. The Long Bull (2011–2019)
 **Steady momentum with defensive discipline.** Tracked the market standard CAGR while minimizing extreme tail-risk.
-![Regime 2 Equity](plots/regime_2_Bull/figure_3_equity_drawdown.png)
+- **Figure 9**: SPY Price & Macro Regime (Bull)
+- **Figure 10**: Capital Allocation (Bull)
+- **Figure 11**: Equity Curves & Drawdown (Bull)
+- **Figure 12**: White's Reality Check (Bull)
+
+![Regime 2 Equity](plots/regime_2_Bull/figure_11_equity_drawdown.png)
 
 ### 3. Modern Vol (2020–2024)
 **Transition to the high-vol era.** Robust capital preservation through the COVID-19 shock and the 2022 rate-hike bear market.
-![Regime 3 Equity](plots/regime_3_Modern/figure_3_equity_drawdown.png)
+- **Figure 13**: SPY Price & Macro Regime (Modern)
+- **Figure 14**: Capital Allocation (Modern)
+- **Figure 15**: Equity Curves & Drawdown (Modern)
+- **Figure 16**: White's Reality Check (Modern)
+
+![Regime 3 Equity](plots/regime_3_Modern/figure_15_equity_drawdown.png)
 
 **Key Takeaway**: The Janus System is a **crisis-alpha** generator, designed to outperform precisely when passive portfolios are most vulnerable.
 
